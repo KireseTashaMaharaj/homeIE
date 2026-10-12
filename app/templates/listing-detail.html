@@ -1,0 +1,55 @@
+{% extends "authenticated-base.html" %}
+{% block title %}{{ listing.title }} - homeIE{% endblock %}
+
+{% block subpage_content %}
+<main class="container-fluid py-2 booking-workflow">
+  <a class="listing-back-link" href="{{ url_for('user_home_view') }}">← Back to Browse</a>
+  <div class="booking-detail-layout mt-3">
+    <section>
+      <div class="mb-4">
+        <div class="d-flex flex-wrap align-items-center gap-2 mb-2">
+          <h1 class="h2 mb-0">{{ listing.title }}</h1>
+          <span class="status-badge status-verified">Verified</span>
+        </div>
+        <p class="text-secondary mb-1">{{ listing.address }}</p>
+        <p class="mb-0"><strong>${{ listing.price|currency }}/month</strong> · {{ listing.roomType }} · sleeps {{ listing.capacity }} · {{ listing.distanceToCampus }} km from campus</p>
+      </div>
+
+      <div class="booking-photo-grid mb-4">
+        {% for photo in photos %}
+        <img src="{{ photo.image }}" alt="Photo {{ loop.index }} of {{ listing.title }}">
+        {% else %}
+        <div class="listing-photo-empty">Photos coming soon</div>
+        {% endfor %}
+      </div>
+
+      <section class="booking-panel mb-4">
+        <h2 class="h4">About this place</h2>
+        <p>{{ listing.description }}</p>
+        <h3 class="h6">Amenities</h3>
+        <p class="mb-0">{{ listing.amenities or "No amenities listed yet." }}</p>
+      </section>
+    </section>
+
+    <aside class="booking-panel booking-request-panel">
+      <p class="listing-eyebrow mb-1">Ready to make it home?</p>
+      <h2 class="h4">Request to book</h2>
+      <p class="text-secondary">Invite any roommates who will share this booking. This home sleeps {{ listing.capacity }}.</p>
+      <form method="post" action="{{ url_for('booking_create_action', listing_id=listing.id) }}">
+        <label class="form-label" for="move_in_date">Move-in date</label>
+        <input class="form-control mb-3" id="move_in_date" name="move_in_date" type="date" required>
+
+        <label class="form-label" for="move_out_date">Move-out date</label>
+        <input class="form-control mb-3" id="move_out_date" name="move_out_date" type="date" required>
+
+        <label class="form-label" for="roommates">Roommate usernames <span class="fw-normal text-secondary">(optional, one per line)</span></label>
+        <textarea class="form-control mb-3" id="roommates" name="roommates" rows="3" placeholder="sara"></textarea>
+
+        <label class="form-label" for="message">Message to landlord <span class="fw-normal text-secondary">(optional)</span></label>
+        <textarea class="form-control mb-3" id="message" name="message" rows="3" placeholder="Tell the landlord a little about your plans."></textarea>
+        <button class="btn btn-primary w-100" type="submit">Request to book</button>
+      </form>
+    </aside>
+  </div>
+</main>
+{% endblock %}

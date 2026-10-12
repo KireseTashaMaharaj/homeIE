@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" role="img" aria-labelledby="title">
+  <title id="title">Bright student studio with a sunny window</title>
+  <rect width="800" height="600" fill="#e5f3ff"/>
+  <rect y="370" width="800" height="230" fill="#e9dfd0"/>
+  <rect x="455" y="75" width="235" height="260" rx="14" fill="#fff"/>
+  <rect x="475" y="95" width="195" height="220" fill="#b9ddf7"/>
+  <path d="M572 95v220M475 205h195" stroke="#fff" stroke-width="13"/>
+  <path d="M475 300c48-90 121-86 195-28v43H475z" fill="#91c6a4"/>
+  <rect x="80" y="350" width="300" height="170" rx="20" fill="#c8b6f6"/>
+  <rect x="65" y="450" width="330" height="42" rx="18" fill="#9b83d9"/>
+  <rect x="112" y="312" width="236" height="68" rx="22" fill="#fff"/>
+  <rect x="108" y="500" width="245" height="17" rx="8" fill="#8169bf"/>
+  <path d="M0 530c185-44 378 47 800-25v95H0z" fill="#d2c3af"/>
+  <circle cx="715" cy="82" r="30" fill="#f8d77c"/>
+</svg>

@@ -1,0 +1,108 @@
+{% extends "authenticated-base.html" %}
+{% block title %}Verification Queue - homeIE{% endblock %}
+
+{% block subpage_content %}
+<main class="container-fluid py-2 listing-workflow">
+  <div class="mb-4">
+    <p class="listing-eyebrow mb-1">Admin workspace</p>
+    <h1 class="h2 mb-1">Verification Queue</h1>
+    <p class="text-secondary mb-0">Review listing details and help make student housing safer.</p>
+  </div>
+
+  <nav class="listing-status-tabs mb-4" aria-label="Listing verification status">
+    <a class="listing-status-tab {{ 'active' if active_status == 'pending' }}" href="{{ url_for('verification_queue_view') }}?status=pending">
+      Pending <span class="count-pill">{{ counts.pending }}</span>
+    </a>
+    <a class="listing-status-tab {{ 'active' if active_status == 'verified' }}" href="{{ url_for('verification_queue_view') }}?status=verified">
+      Approved <span class="count-pill">{{ counts.verified }}</span>
+    </a>
+    <a class="listing-status-tab {{ 'active' if active_status == 'rejected' }}" href="{{ url_for('verification_queue_view') }}?status=rejected">
+      Rejected <span class="count-pill">{{ counts.rejected }}</span>
+    </a>
+  </nav>
+
+  <div class="verification-layout">
+    <section class="verification-list" aria-label="{{ active_status|title }} listings">
+      {% for listing in listings %}
+      <a class="verification-list-item {{ 'selected' if selected and listing.id == selected.id }}"
+         href="{{ url_for('verification_queue_view') }}?status={{ active_status }}&listing_id={{ listing.id }}">
+        <strong>{{ listing.title }}</strong>
+        <span>{{ landlords.get(listing.landlordId).fullName if landlords.get(listing.landlordId) else 'Landlord' }}</span>
+        <small>{{ listing.createdAt.strftime("%b %d, %Y") }}</small>
+      </a>
+      {% else %}
+      <div class="verification-empty">No {{ active_status }} listings.</div>
+      {% endfor %}
+    </section>
+
+    <section class="verification-detail">
+      {% if selected %}
+      <div class="d-flex flex-wrap justify-content-between align-items-start gap-2 mb-3">
+        <div>
+          <span class="status-badge status-{{ selected.status }}">
+            {% if selected.status == "verified" %}Verified{% else %}{{ selected.status|title }}{% endif %}
+          </span>
+          <h2 class="h3 mt-3 mb-1">{{ selected.title }}</h2>
+        </div>
+      </div>
+      <div class="verification-photos">
+        {% for photo in detail_photos %}
+        <img src="{{ photo.image }}" alt="Photo of {{ selected.title }}">
+        {% else %}
+        <div class="listing-photo-empty">No photos provided</div>
+        {% endfor %}
+      </div>
+      <p class="h5 mt-3">${{ selected.price|currency }}/month · {{ selected.roomType }} · sleeps {{ selected.capacity }}</p>
+      <p class="text-secondary">{{ selected.address }} · {{ selected.distanceToCampus }} km from campus</p>
+      <h3 class="h6 mt-4">Amenities</h3>
+      <p>{{ selected.amenities or "No amenities listed." }}</p>
+      <h3 class="h6 mt-4">Description</h3>
+      <p>{{ selected.description }}</p>
+      {% set landlord = landlords.get(selected.landlordId) %}
+      <p class="text-secondary">Landlord: {{ landlord.fullName if landlord else "Unknown" }}{% if landlord %} · {{ landlord.email }}{% endif %}</p>
+      <p class="text-secondary">Submitted {{ selected.createdAt.strftime("%b %d, %Y") }}</p>
+      {% if selected.rejectionReason %}
+      <p class="listing-rejection"><strong>Rejection reason:</strong> {{ selected.rejectionReason }}</p>
+      {% endif %}
+      {% if active_status == "pending" %}
+      <div class="d-flex flex-wrap gap-2 mt-4">
+        <form method="post" action="{{ url_for('listing_moderate_action', listing_id=selected.id) }}">
+          <input type="hidden" name="decision" value="approve">
+          <button class="btn btn-primary" type="submit">Approve listing</button>
+        </form>
+        <button class="btn btn-outline-secondary" type="button" data-bs-toggle="modal" data-bs-target="#rejectListingModal">Reject...</button>
+      </div>
+      <div class="modal fade" id="rejectListingModal" tabindex="-1" aria-labelledby="rejectListingTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+            <form method="post" action="{{ url_for('listing_moderate_action', listing_id=selected.id) }}">
+              <div class="modal-header">
+                <h2 class="modal-title fs-5" id="rejectListingTitle">Reject listing</h2>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                <p><strong>{{ selected.title }}</strong> · ${{ selected.price|currency }}/month</p>
+                <input type="hidden" name="decision" value="reject">
+                <label class="form-label" for="rejection_reason">Reason (required)</label>
+                <textarea class="form-control" id="rejection_reason" name="rejection_reason" rows="4" required maxlength="1000" placeholder="e.g. Please add clear photos of the bathroom."></textarea>
+                <p class="form-text">The landlord will see this reason and can edit and resubmit the listing.</p>
+              </div>
+              <div class="modal-footer">
+                <button class="btn btn-outline-secondary" type="button" data-bs-dismiss="modal">Cancel</button>
+                <button class="btn btn-primary" type="submit">Reject listing</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+      {% endif %}
+      {% else %}
+      <div class="listing-empty-state">
+        <h2 class="h5">Nothing to review here</h2>
+        <p class="text-secondary">Choose another tab or wait for a landlord to submit a listing.</p>
+      </div>
+      {% endif %}
+    </section>
+  </div>
+</main>
+{% endblock %}

@@ -1,12 +1,15 @@
 {% extends "base.html" %}
-{% block title %}Register{% endblock %}
+{% block title %}Create your homeIE account{% endblock %}
 
 {% block content %}
 <div class="auth-shell">
   <div class="auth-panel">
-    <a class="auth-back" href="{{ url_for('index_view') }}">← Home</a>
-    <div class="brand-wordmark">FastStarter</div>
-    <p class="auth-tagline">Create an account</p>
+    <a class="auth-logo" href="{{ url_for('index_view') }}">
+      <img src="{{ url_for('static', path='img/homeie-logo.png') }}"
+           alt="homeIE - Your Place, Your People">
+    </a>
+    <h1 class="auth-heading">Make yourself at home</h1>
+    <p class="auth-tagline">Create an account to get started.</p>
 
     <form method="POST" action="{{ url_for('register_view') }}">
       <div class="mb-3">
@@ -16,6 +19,13 @@
       <div class="mb-3">
         <label class="form-label" for="email">Email</label>
         <input class="form-control" type="email" id="email" name="email" required>
+      </div>
+      <div class="mb-3">
+        <label class="form-label" for="role">I am a</label>
+        <select class="form-select" id="role" name="role" required>
+          <option value="student">Student</option>
+          <option value="landlord">Landlord</option>
+        </select>
       </div>
       <div class="mb-3">
         <label class="form-label" for="password">Password</label>

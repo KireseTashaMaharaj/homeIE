@@ -1,21 +1,16 @@
-from fastapi import APIRouter, HTTPException, Depends, Request
-from fastapi.responses import HTMLResponse, RedirectResponse
-from fastapi import status
-from app.dependencies.session import SessionDep
-from app.dependencies.auth import AdminDep, IsUserLoggedIn, get_current_user, is_admin
-from . import router, templates
+from fastapi import Request
+from fastapi.responses import RedirectResponse
+from starlette import status
+from app.dependencies.auth import AdminDep
+from . import router
 
 
-@router.get("/admin", response_class=HTMLResponse)
+@router.get("/admin")
 async def admin_home_view(
     request: Request,
     user: AdminDep,
-    db:SessionDep
 ):
-    return templates.TemplateResponse(
-        request=request, 
-        name="admin.html",
-        context={
-            "user": user
-        }
+    return RedirectResponse(
+        url=request.url_for("verification_queue_view"),
+        status_code=status.HTTP_303_SEE_OTHER,
     )

@@ -1,0 +1,73 @@
+{% extends "authenticated-base.html" %}
+{% block title %}My Listings - homeIE{% endblock %}
+
+{% block subpage_content %}
+<main class="container-fluid py-2 listing-workflow">
+  <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+    <div>
+      <p class="listing-eyebrow mb-1">Landlord workspace</p>
+      <h1 class="h2 mb-1">My Listings</h1>
+      <p class="text-secondary mb-0">Create a home, then send it to homeIE for verification.</p>
+    </div>
+    <a class="btn btn-primary" href="{{ url_for('listing_create_view') }}">Create new listing</a>
+  </div>
+
+  <nav class="listing-status-tabs mb-4" aria-label="Filter listings by status">
+    <a class="listing-status-tab {{ 'active' if active_status == 'all' }}"
+       href="{{ url_for('landlord_listings_view') }}">All</a>
+    {% for status in statuses %}
+    <a class="listing-status-tab {{ 'active' if active_status == status }}"
+       href="{{ url_for('landlord_listings_view') }}?status={{ status }}">
+      <span class="status-badge status-{{ status }}">{{ status|title }}</span>
+    </a>
+    {% endfor %}
+  </nav>
+
+  {% if listings %}
+  <div class="listing-card-list">
+    {% for listing in listings %}
+    <article class="listing-card">
+      <div class="listing-card-photo">
+        {% if photos.get(listing.id) %}
+        <img src="{{ photos.get(listing.id)[0].image }}" alt="Photo of {{ listing.title }}">
+        {% else %}
+        <div class="listing-photo-empty" aria-label="No listing photo yet">Add a photo URL</div>
+        {% endif %}
+      </div>
+      <div class="listing-card-main">
+        <div class="d-flex flex-wrap justify-content-between align-items-start gap-2">
+          <div>
+            <h2 class="h5 mb-1">{{ listing.title }}</h2>
+            <p class="text-secondary mb-2">{{ listing.address }} · {{ listing.distanceToCampus }} km from campus</p>
+          </div>
+          <span class="status-badge status-{{ listing.status }}">
+            {% if listing.status == "verified" %}Verified{% else %}{{ listing.status|title }}{% endif %}
+          </span>
+        </div>
+        <p class="mb-1"><strong>${{ listing.price|currency }}/month</strong> · {{ listing.roomType }} · sleeps {{ listing.capacity }}</p>
+        {% if listing.status == "rejected" and listing.rejectionReason %}
+        <p class="listing-rejection mb-3"><strong>Rejection reason:</strong> {{ listing.rejectionReason }}</p>
+        {% endif %}
+        <div class="d-flex flex-wrap gap-2 mt-3">
+          {% if listing.status in ["draft", "rejected"] %}
+          <a class="btn btn-outline-secondary btn-sm" href="{{ url_for('listing_edit_view', listing_id=listing.id) }}">Edit</a>
+          <form method="post" action="{{ url_for('listing_submit_action', listing_id=listing.id) }}">
+            <button class="btn btn-primary btn-sm" type="submit">
+              {% if listing.status == "rejected" %}Resubmit{% else %}Submit for verification{% endif %}
+            </button>
+          </form>
+          {% endif %}
+        </div>
+      </div>
+    </article>
+    {% endfor %}
+  </div>
+  {% else %}
+  <section class="listing-empty-state">
+    <h2 class="h5">No {{ active_status if active_status != "all" else "" }} listings yet</h2>
+    <p class="text-secondary">Your homes will appear here as you create and submit them.</p>
+    <a class="btn btn-primary" href="{{ url_for('listing_create_view') }}">Create your first listing</a>
+  </section>
+  {% endif %}
+</main>
+{% endblock %}

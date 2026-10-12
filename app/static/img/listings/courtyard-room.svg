@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" role="img" aria-labelledby="title">
+  <title id="title">Airy student room overlooking a leafy courtyard</title>
+  <rect width="800" height="600" fill="#f5edff"/>
+  <rect y="382" width="800" height="218" fill="#d9cbbc"/>
+  <rect x="350" y="74" width="350" height="282" rx="12" fill="#fff"/>
+  <rect x="372" y="96" width="306" height="238" fill="#b9ddf7"/>
+  <path d="M525 96v238M372 214h306" stroke="#fff" stroke-width="13"/>
+  <path d="M372 300c52-70 101-62 145-10 59-86 103-67 161-19v63H372z" fill="#91bf8c"/>
+  <path d="M380 282c12-50 44-68 76-83-1 41-25 69-76 83zM568 283c17-59 53-78 94-94-6 48-37 79-94 94z" fill="#608f68"/>
+  <rect x="64" y="349" width="243" height="144" rx="28" fill="#b9ddf7"/>
+  <rect x="48" y="420" width="273" height="53" rx="17" fill="#85bddd"/>
+  <rect x="89" y="323" width="194" height="58" rx="20" fill="#fff"/>
+  <path d="M0 523c205-33 515 46 800-30v107H0z" fill="#c8b39a"/>
+  <circle cx="123" cy="105" r="31" fill="#f6d77c"/>
+</svg>

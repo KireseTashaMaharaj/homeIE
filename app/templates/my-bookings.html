@@ -1,0 +1,92 @@
+{% extends "authenticated-base.html" %}
+{% block title %}My Bookings - homeIE{% endblock %}
+
+{% block subpage_content %}
+<main class="container-fluid py-2 booking-workflow">
+  <div class="mb-4">
+    <p class="listing-eyebrow mb-1">Your home search</p>
+    <h1 class="h2 mb-1">My Bookings</h1>
+    <p class="text-secondary mb-0">Follow requests and respond to invitations from your future housemates.</p>
+  </div>
+  <nav class="listing-status-tabs mb-4" aria-label="Booking tabs">
+    {% for key, label in [("active", "Active"), ("confirmed", "Confirmed"), ("closed", "Past / Closed"), ("invitations", "Invitations")] %}
+    <a class="listing-status-tab {{ 'active' if tab == key }}" href="{{ url_for('my_bookings_view').include_query_params(tab=key) }}">{{ label }}</a>
+    {% endfor %}
+  </nav>
+
+  {% if tab == "invitations" %}
+    <div class="booking-card-list">
+      {% for item in invitations %}
+      <article class="booking-card">
+        <div class="booking-card-heading">
+          <div>
+            <p class="listing-eyebrow mb-1">Roommate invitation</p>
+            <h2 class="h5 mb-1">{{ item.listing.title }}</h2>
+            <p class="text-secondary mb-0">Invited by {{ item.inviter.fullName or item.inviter.username }} · {{ item.listing.address }}</p>
+          </div>
+          <span class="status-badge status-pending">Waiting for you</span>
+        </div>
+        <p class="mb-3">Dates: {{ item.booking.moveInDate }} to {{ item.booking.moveOutDate }}</p>
+        <div class="d-flex flex-wrap gap-2">
+          <form method="post" action="{{ url_for('booking_invitation_action', booking_id=item.booking.id) }}">
+            <input type="hidden" name="decision" value="accept">
+            <button class="btn btn-primary" type="submit">Accept</button>
+          </form>
+          <form method="post" action="{{ url_for('booking_invitation_action', booking_id=item.booking.id) }}">
+            <input type="hidden" name="decision" value="decline">
+            <button class="btn btn-outline-secondary" type="submit">Decline</button>
+          </form>
+        </div>
+      </article>
+      {% else %}
+      <section class="listing-empty-state"><h2 class="h5">No pending invitations</h2><p class="mb-0 text-secondary">Roommate invitations will appear here.</p></section>
+      {% endfor %}
+    </div>
+  {% else %}
+    {% set visible = [] %}
+    {% for item in bookings %}
+      {% if (tab == "active" and item.booking.status in ["pending_roommates", "pending_landlord"]) or (tab == "confirmed" and item.booking.status == "confirmed") or (tab == "closed" and item.booking.status in ["declined", "cancelled"]) %}
+        {% set _ = visible.append(item) %}
+      {% endif %}
+    {% endfor %}
+    <div class="booking-card-list">
+      {% for item in visible %}
+      <article class="booking-card">
+        <div class="booking-card-heading">
+          <div>
+            <p class="listing-eyebrow mb-1">{{ item.listing.address }}</p>
+            <h2 class="h5 mb-1">{{ item.listing.title }}</h2>
+            <p class="mb-0"><strong>${{ item.listing.price|currency }}/month</strong> · sleeps {{ item.listing.capacity }}</p>
+          </div>
+          <span class="status-badge status-{{ item.booking.status }}">{{ item.booking.status|replace("_", " ")|title }}</span>
+        </div>
+        <p class="mt-3 mb-2">Dates: {{ item.booking.moveInDate }} to {{ item.booking.moveOutDate }}</p>
+        <p class="mb-2"><strong>Household:</strong>
+          {% for person in item.tenants %}
+            {{ person.user.fullName or person.user.username }} ({{ "lead tenant" if person.tenant.tenantRole == "booker" else ("invitation closed" if item.booking.status == "cancelled" and person.tenant.response == "pending" else "roommate: " ~ person.tenant.response) }}){% if not loop.last %}, {% endif %}
+          {% endfor %}
+        </p>
+        {% for person in item.tenants %}
+          {% if person.tenant.response == "declined" %}
+          <p class="booking-reason mb-2"><strong>{{ person.user.fullName or person.user.username }}</strong> declined the roommate invitation.</p>
+          {% endif %}
+        {% endfor %}
+        {% if item.booking.declineReason %}
+        <p class="booking-reason mb-2"><strong>Landlord's reason:</strong> {{ item.booking.declineReason }}</p>
+        {% endif %}
+        {% if item.booking.message %}
+        <p class="text-secondary mb-2"><strong>Your message:</strong> {{ item.booking.message }}</p>
+        {% endif %}
+        {% if user.id == item.booking.bookerId and item.booking.status in ["pending_roommates", "pending_landlord"] %}
+        <form method="post" action="{{ url_for('booking_cancel_action', booking_id=item.booking.id) }}">
+          <button class="btn btn-outline-secondary btn-sm" type="submit">Cancel request</button>
+        </form>
+        {% endif %}
+      </article>
+      {% else %}
+      <section class="listing-empty-state"><h2 class="h5">Nothing to show yet</h2><p class="mb-0 text-secondary">Your booking activity will appear here.</p></section>
+      {% endfor %}
+    </div>
+  {% endif %}
+</main>
+{% endblock %}

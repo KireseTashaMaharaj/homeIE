@@ -1,9 +1,43 @@
 {% extends "authenticated-base.html" %}
-{% block title %}Home{% endblock %}
+{% block title %}Browse verified listings - homeIE{% endblock %}
 
 {% block subpage_content %}
 <div class="container-fluid py-2">
-  <h1 class="h4 mb-2">Home</h1>
-  <p class="text-muted mb-0">Workflow screens replace this shell in Phase 5 implement.</p>
+  <div class="mb-4">
+    <p class="listing-eyebrow mb-1">Find a place near UWI St. Augustine</p>
+    <h1 class="h2 mb-1">Browse verified listings</h1>
+    <p class="text-secondary mb-0">Every home shown here has been reviewed by homeIE.</p>
+  </div>
+  <div class="row g-4">
+    {% for listing in listings %}
+    <div class="col-12 col-md-6 col-xl-6">
+      <a class="listing-card listing-card-student listing-card-link h-100"
+         href="{{ url_for('listing_detail_view', listing_id=listing.id) }}">
+        <div class="listing-card-photo">
+          {% if photos.get(listing.id) %}
+          <img src="{{ photos.get(listing.id)[0].image }}" alt="Photo of {{ listing.title }}">
+          {% else %}
+          <div class="listing-photo-empty">homeIE home</div>
+          {% endif %}
+        </div>
+        <div class="listing-card-main">
+          <div class="listing-student-heading">
+            <h2 class="h5 mb-0">{{ listing.title }}</h2>
+            <span class="status-badge status-verified">Verified</span>
+          </div>
+          <p class="text-secondary">{{ listing.address }} · {{ listing.distanceToCampus }} km from campus</p>
+          <p class="mb-0"><strong>${{ listing.price|currency }}/month</strong> · {{ listing.roomType }} · sleeps {{ listing.capacity }}</p>
+        </div>
+      </a>
+    </div>
+    {% else %}
+    <div class="col-12">
+      <section class="listing-empty-state">
+        <h2 class="h5">No verified listings yet</h2>
+        <p class="text-secondary mb-0">Check back soon for homes reviewed by homeIE.</p>
+      </section>
+    </div>
+    {% endfor %}
+  </div>
 </div>
 {% endblock %}

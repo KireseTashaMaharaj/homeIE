@@ -1,0 +1,72 @@
+{% extends "authenticated-base.html" %}
+{% block title %}Booking Requests - homeIE{% endblock %}
+
+{% block subpage_content %}
+<main class="container-fluid py-2 booking-workflow">
+  <div class="mb-4">
+    <p class="listing-eyebrow mb-1">Landlord workspace</p>
+    <h1 class="h2 mb-1">Booking Requests</h1>
+    <p class="text-secondary mb-0">Review requests for your verified homes.</p>
+  </div>
+  <nav class="listing-status-tabs mb-4" aria-label="Booking request tabs">
+    {% for key, label in [("pending", "Pending"), ("confirmed", "Confirmed"), ("declined", "Declined")] %}
+    <a class="listing-status-tab {{ 'active' if tab == key }}" href="{{ url_for('landlord_booking_requests_view').include_query_params(tab=key) }}">{{ label }}</a>
+    {% endfor %}
+  </nav>
+
+  <div class="booking-card-list">
+    {% for item in requests %}
+    <article class="booking-card">
+      <div class="booking-card-heading">
+        <div>
+          <p class="listing-eyebrow mb-1">{{ item.listing.address }}</p>
+          <h2 class="h5 mb-1">{{ item.listing.title }}</h2>
+          <p class="mb-0"><strong>${{ item.listing.price|currency }}/month</strong> · sleeps {{ item.listing.capacity }}</p>
+        </div>
+        <span class="status-badge status-{{ item.booking.status }}">{{ item.booking.status|replace("_", " ")|title }}</span>
+      </div>
+      <p class="mt-3 mb-2">Dates: {{ item.booking.moveInDate }} to {{ item.booking.moveOutDate }}</p>
+      <p class="mb-2"><strong>Tenants:</strong>
+        {% for person in item.tenants %}
+          {{ person.user.fullName or person.user.username }} ({{ "lead tenant" if person.tenant.tenantRole == "booker" else "roommate" }}){% if not loop.last %}, {% endif %}
+        {% endfor %}
+      </p>
+      {% if item.booking.message %}<p class="text-secondary mb-3"><strong>Message:</strong> {{ item.booking.message }}</p>{% endif %}
+      {% if item.booking.declineReason %}<p class="booking-reason mb-3"><strong>Decline reason:</strong> {{ item.booking.declineReason }}</p>{% endif %}
+      {% if tab == "pending" %}
+      <div class="d-flex flex-wrap gap-2">
+        <form method="post" action="{{ url_for('landlord_booking_decision_action', booking_id=item.booking.id) }}">
+          <input type="hidden" name="decision" value="accept">
+          <button class="btn btn-primary" type="submit">Accept</button>
+        </form>
+        <button class="btn btn-outline-secondary" type="button" data-bs-toggle="modal" data-bs-target="#decline-{{ item.booking.id }}">Decline</button>
+      </div>
+      <div class="modal fade" id="decline-{{ item.booking.id }}" tabindex="-1" aria-labelledby="decline-label-{{ item.booking.id }}" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+            <form method="post" action="{{ url_for('landlord_booking_decision_action', booking_id=item.booking.id) }}">
+              <div class="modal-header">
+                <h2 class="modal-title h5" id="decline-label-{{ item.booking.id }}">Decline booking request</h2>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                <label class="form-label" for="reason-{{ item.booking.id }}">Reason (required)</label>
+                <textarea class="form-control" id="reason-{{ item.booking.id }}" name="decline_reason" rows="4" required></textarea>
+                <input type="hidden" name="decision" value="decline">
+              </div>
+              <div class="modal-footer">
+                <button class="btn btn-outline-secondary" type="button" data-bs-dismiss="modal">Cancel</button>
+                <button class="btn btn-primary" type="submit">Confirm decline</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+      {% endif %}
+    </article>
+    {% else %}
+    <section class="listing-empty-state"><h2 class="h5">No {{ tab }} requests</h2><p class="mb-0 text-secondary">Requests for your listings will appear here.</p></section>
+    {% endfor %}
+  </div>
+</main>
+{% endblock %}

@@ -4,7 +4,7 @@
 <style>
     body {
         overflow-x: hidden;
-        background: #f4f6f8;
+        background: var(--brand-bg);
     }
 
     #wrapper {
@@ -18,7 +18,8 @@
         min-height: 100vh;
         transition: all 0.3s;
         background: var(--brand-sidebar);
-        color: #fff;
+        color: var(--brand-ink);
+        border-right: 1px solid var(--brand-border);
     }
 
     #sidebar.collapsed {
@@ -26,22 +27,23 @@
     }
 
     #sidebar .nav-link {
-        color: var(--brand-sidebar-text);
+        color: var(--brand-ink);
         font-weight: 500;
     }
 
     #sidebar .nav-link:hover,
     #sidebar .nav-link.active {
-        color: #fff;
-        background-color: color-mix(in srgb, var(--brand-accent) 55%, #000);
+        color: var(--brand-ink);
+        background-color: var(--brand-accent);
         border-radius: 0.5rem;
     }
 
     #sidebar .brand-wordmark {
-        color: #fff;
+        color: var(--brand-ink);
         font-size: 1.25rem;
         text-align: center;
         margin: 1rem 0 1.5rem;
+        font-weight: 800;
     }
 
     #content {
@@ -50,11 +52,34 @@
         transition: all 0.3s;
         display: flex;
         flex-direction: column;
-        background-color: #f4f6f8;
+        background-color: var(--brand-bg);
     }
 
     .navbar {
-        border-bottom: 1px solid #dee2e6;
+        border: 1px solid var(--brand-border);
+        background: var(--brand-surface) !important;
+        box-shadow: 0 0.35rem 1.2rem rgba(53, 42, 81, 0.06);
+    }
+
+    @media (max-width: 720px) {
+        #wrapper {
+            flex-direction: column;
+        }
+
+        #sidebar {
+            min-width: 0;
+            max-width: none;
+            min-height: auto !important;
+        }
+
+        #sidebar.collapsed {
+            display: none;
+            margin-left: 0;
+        }
+
+        #content {
+            min-width: 0;
+        }
     }
 </style>
 {% block additional_styles %}{% endblock %}
@@ -63,15 +88,39 @@
 {% block content %}
 <div id="wrapper">
     <nav id="sidebar" class="p-3 d-flex flex-column vh-100">
-        <div class="brand-wordmark">FastStarter</div>
+        <div class="brand-wordmark">homeIE</div>
 
         <ul class="nav nav-pills flex-column gap-2 flex-grow-1">
             <li class="nav-item">
-                <a class="nav-link d-flex align-items-center {{ 'active' if request.url.path.startswith('/app') }}"
+                {% if user.role == "admin" %}
+                <a class="nav-link d-flex align-items-center {{ 'active' if request.url.path.startswith('/admin') }}"
+                   href="{{ url_for('verification_queue_view') }}">
+                    <span class="material-symbols-outlined me-2">home</span>
+                    Verification Queue
+                </a>
+                {% elif user.role == "landlord" %}
+                <a class="nav-link d-flex align-items-center {{ 'active' if request.url.path.startswith('/landlord/listings') }}"
+                   href="{{ url_for('landlord_listings_view') }}">
+                    <span class="material-symbols-outlined me-2">home</span>
+                    My Listings
+                </a>
+                <a class="nav-link d-flex align-items-center {{ 'active' if request.url.path.startswith('/landlord/booking-requests') }}"
+                   href="{{ url_for('landlord_booking_requests_view') }}">
+                    <span class="material-symbols-outlined me-2">event_note</span>
+                    Booking Requests
+                </a>
+                {% else %}
+                <a class="nav-link d-flex align-items-center {{ 'active' if request.url.path == '/app' or request.url.path.startswith('/app/listings') }}"
                    href="{{ url_for('user_home_view') }}">
                     <span class="material-symbols-outlined me-2">home</span>
-                    Home
+                    Browse
                 </a>
+                <a class="nav-link d-flex align-items-center {{ 'active' if request.url.path.startswith('/app/bookings') }}"
+                   href="{{ url_for('my_bookings_view') }}">
+                    <span class="material-symbols-outlined me-2">calendar_month</span>
+                    My Bookings
+                </a>
+                {% endif %}
             </li>
             <li class="nav-item mt-auto">
                 <a class="nav-link d-flex align-items-center text-danger" href="{{ url_for('logout') }}">
@@ -88,7 +137,7 @@
                 <span class="material-symbols-outlined md-dark">menu</span>
             </button>
             <div class="ms-auto d-flex align-items-center gap-3">
-                <span class="fw-semibold">Welcome, {{ user.username }}</span>
+                <span class="fw-semibold">Welcome, {{ 'admin' if user.role == 'admin' else user.username }}</span>
             </div>
         </nav>
 

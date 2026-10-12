@@ -1,0 +1,89 @@
+@startuml
+!pragma layout smetana
+skinparam shadowing false
+skinparam actorBorderColor #1B365D
+skinparam actorFontColor #1E232D
+skinparam usecaseBackgroundColor #FFFFFF
+skinparam usecaseBorderColor #1B365D
+skinparam usecaseFontColor #1E232D
+skinparam rectangleBorderColor #1B365D
+skinparam rectangleBackgroundColor #F8FAFC
+skinparam arrowColor #1B365D
+
+actor "Student" as Student
+actor "Roommate" as Roommate
+
+rectangle "Student Accommodation Marketplace" {
+  usecase "Register / Login" as Register_Login
+  usecase "Browse Verified Listings" as Browse_Verified_Listings
+  usecase "Filter and Search Listings" as Filter_and_Search_Listings
+  usecase "View Listing Details and Reviews" as View_Listing_Details_and_Reviews
+  usecase "Request a Booking" as Request_a_Booking
+  usecase "Invite Roommates to a Booking" as Invite_Roommates_to_a_Booking
+  usecase "View Roommate Responses" as View_Roommate_Responses
+  usecase "View My Bookings and Their Status" as View_My_Bookings_and_Their_Status
+  usecase "Cancel a Pending Request" as Cancel_a_Pending_Request
+  usecase "Leave a Review After a Completed Stay" as Leave_a_Review_After_a_Completed_Stay
+  usecase "View Booking Invitations" as View_Booking_Invitations
+  usecase "Accept or Decline an Invitation" as Accept_or_Decline_an_Invitation
+  usecase "Create a Listing" as Create_a_Listing
+  usecase "Edit a Listing" as Edit_a_Listing
+  usecase "Submit a Listing for Verification" as Submit_a_Listing_for_Verification
+  usecase "View Rejection Reason and Resubmit" as View_Rejection_Reason_and_Resubmit
+  usecase "View Incoming Booking Requests" as View_Incoming_Booking_Requests
+  usecase "Accept a Request" as Accept_a_Request
+  usecase "Decline a Request with a Reason" as Decline_a_Request_with_a_Reason
+  usecase "View Pending Verification Queue" as View_Pending_Verification_Queue
+  usecase "Approve a Listing" as Approve_a_Listing
+  usecase "Reject a Listing with a Reason" as Reject_a_Listing_with_a_Reason
+  usecase "Remove an Inappropriate Review" as Remove_an_Inappropriate_Review
+}
+
+actor "Landlord" as Landlord
+actor "Admin" as Admin
+
+Student --> Register_Login
+Roommate --> Register_Login
+Register_Login <-- Landlord
+Register_Login <-- Admin
+Student --> Browse_Verified_Listings
+Browse_Verified_Listings ..> Filter_and_Search_Listings : <<include>>
+Browse_Verified_Listings ..> View_Listing_Details_and_Reviews : <<include>>
+Student --> Filter_and_Search_Listings
+Student --> View_Listing_Details_and_Reviews
+Student --> Request_a_Booking
+Request_a_Booking ..> View_Listing_Details_and_Reviews : <<include>>
+Student --> Invite_Roommates_to_a_Booking
+Invite_Roommates_to_a_Booking ..> Request_a_Booking : <<extend>>
+Student --> View_Roommate_Responses
+Student --> View_My_Bookings_and_Their_Status
+Roommate --> View_My_Bookings_and_Their_Status
+Student --> Cancel_a_Pending_Request
+Cancel_a_Pending_Request ..> View_My_Bookings_and_Their_Status : <<extend>>
+Student --> Leave_a_Review_After_a_Completed_Stay
+Roommate --> Leave_a_Review_After_a_Completed_Stay
+Leave_a_Review_After_a_Completed_Stay ..> View_My_Bookings_and_Their_Status : <<extend>>
+Roommate --> View_Booking_Invitations
+Roommate --> Accept_or_Decline_an_Invitation
+Accept_or_Decline_an_Invitation ..> View_Booking_Invitations : <<include>>
+Accept_or_Decline_an_Invitation ..> View_My_Bookings_and_Their_Status : <<include>>
+Create_a_Listing <-- Landlord
+Edit_a_Listing <-- Landlord
+Edit_a_Listing ..> Create_a_Listing : <<extend>>
+Submit_a_Listing_for_Verification <-- Landlord
+Submit_a_Listing_for_Verification ..> Create_a_Listing : <<include>>
+View_Rejection_Reason_and_Resubmit <-- Landlord
+View_Rejection_Reason_and_Resubmit ..> Submit_a_Listing_for_Verification : <<extend>>
+View_Incoming_Booking_Requests <-- Landlord
+Accept_a_Request <-- Landlord
+Accept_a_Request ..> View_Incoming_Booking_Requests : <<extend>>
+Decline_a_Request_with_a_Reason <-- Landlord
+Decline_a_Request_with_a_Reason ..> View_Incoming_Booking_Requests : <<extend>>
+View_Pending_Verification_Queue <-- Admin
+Approve_a_Listing <-- Admin
+Approve_a_Listing ..> View_Pending_Verification_Queue : <<include>>
+Reject_a_Listing_with_a_Reason <-- Admin
+Reject_a_Listing_with_a_Reason ..> View_Pending_Verification_Queue : <<include>>
+Remove_an_Inappropriate_Review <-- Admin
+
+@enduml

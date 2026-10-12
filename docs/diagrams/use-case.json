@@ -1,0 +1,116 @@
+{
+  "system": "Student Accommodation Marketplace",
+  "actors": [
+    {"name": "Student", "side": "left"},
+    {"name": "Roommate", "side": "left"},
+    {"name": "Landlord", "side": "right"},
+    {"name": "Admin", "side": "right"}
+  ],
+  "use_cases": [
+    {
+      "name": "Register / Login",
+      "actors": ["Student", "Roommate", "Landlord", "Admin"]
+    },
+    {
+      "name": "Browse Verified Listings",
+      "actors": ["Student"],
+      "includes": ["Filter and Search Listings", "View Listing Details and Reviews"]
+    },
+    {
+      "name": "Filter and Search Listings",
+      "actors": ["Student"]
+    },
+    {
+      "name": "View Listing Details and Reviews",
+      "actors": ["Student"]
+    },
+    {
+      "name": "Request a Booking",
+      "actors": ["Student"],
+      "includes": ["View Listing Details and Reviews"]
+    },
+    {
+      "name": "Invite Roommates to a Booking",
+      "actors": ["Student"],
+      "extends": ["Request a Booking"]
+    },
+    {
+      "name": "View Roommate Responses",
+      "actors": ["Student"]
+    },
+    {
+      "name": "View My Bookings and Their Status",
+      "actors": ["Student", "Roommate"]
+    },
+    {
+      "name": "Cancel a Pending Request",
+      "actors": ["Student"],
+      "extends": ["View My Bookings and Their Status"]
+    },
+    {
+      "name": "Leave a Review After a Completed Stay",
+      "actors": ["Student", "Roommate"],
+      "extends": ["View My Bookings and Their Status"]
+    },
+    {
+      "name": "View Booking Invitations",
+      "actors": ["Roommate"]
+    },
+    {
+      "name": "Accept or Decline an Invitation",
+      "actors": ["Roommate"],
+      "includes": ["View Booking Invitations", "View My Bookings and Their Status"]
+    },
+    {
+      "name": "Create a Listing",
+      "actors": ["Landlord"]
+    },
+    {
+      "name": "Edit a Listing",
+      "actors": ["Landlord"],
+      "extends": ["Create a Listing"]
+    },
+    {
+      "name": "Submit a Listing for Verification",
+      "actors": ["Landlord"],
+      "includes": ["Create a Listing"]
+    },
+    {
+      "name": "View Rejection Reason and Resubmit",
+      "actors": ["Landlord"],
+      "extends": ["Submit a Listing for Verification"]
+    },
+    {
+      "name": "View Incoming Booking Requests",
+      "actors": ["Landlord"]
+    },
+    {
+      "name": "Accept a Request",
+      "actors": ["Landlord"],
+      "extends": ["View Incoming Booking Requests"]
+    },
+    {
+      "name": "Decline a Request with a Reason",
+      "actors": ["Landlord"],
+      "extends": ["View Incoming Booking Requests"]
+    },
+    {
+      "name": "View Pending Verification Queue",
+      "actors": ["Admin"]
+    },
+    {
+      "name": "Approve a Listing",
+      "actors": ["Admin"],
+      "includes": ["View Pending Verification Queue"]
+    },
+    {
+      "name": "Reject a Listing with a Reason",
+      "actors": ["Admin"],
+      "includes": ["View Pending Verification Queue"]
+    },
+    {
+      "name": "Remove an Inappropriate Review",
+      "actors": ["Admin"]
+    }
+  ]
+}

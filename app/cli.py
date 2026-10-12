@@ -46,12 +46,8 @@ def cmd_init(args: argparse.Namespace) -> None:
         cmd_seed(args)
 
 
-def cmd_seed(args: argparse.Namespace) -> None:
-    """Insert demo users.
-
-    bob / bobpass       (regular_user)
-    admin / adminpass   (admin)
-    """
+def _legacy_cmd_seed(args: argparse.Namespace) -> None:
+    """Seed homeIE demo accounts and sample listings."""
     from app.database import ensure_db_and_tables, get_cli_session
     from app.repositories.user import UserRepository
     from app.schemas.user import AdminCreate, RegularUserCreate
@@ -88,6 +84,13 @@ def cmd_seed(args: argparse.Namespace) -> None:
 
     print(f"Seed done — created {created}, skipped {skipped}.")
     print("Login with bob/bobpass or admin/adminpass")
+
+
+def cmd_seed(args: argparse.Namespace) -> None:
+    """Seed homeIE demo accounts and sample listings."""
+    from app.seed_data import seed_homeie
+
+    seed_homeie()
 
 
 def cmd_run(args: argparse.Namespace) -> None:
@@ -221,13 +224,13 @@ def build_parser() -> argparse.ArgumentParser:
 
     p_init = sub.add_parser(
         "init",
-        help="Create DB tables and seed demo users (drops existing tables by default)",
+        help="Create DB tables and seed homeIE demo accounts/listings (drops tables by default)",
     )
     p_init.add_argument(
         "--no-drop",
         dest="drop",
         action="store_false",
-        help="Create tables without dropping existing ones",
+        help="Create tables without dropping or migrating an existing schema",
     )
     p_init.add_argument(
         "--no-seed",
@@ -239,7 +242,7 @@ def build_parser() -> argparse.ArgumentParser:
 
     p_seed = sub.add_parser(
         "seed",
-        help="Insert demo users only (idempotent; also runs as part of init)",
+        help="Seed homeIE demo accounts and listings without dropping tables",
     )
     p_seed.set_defaults(func=cmd_seed)
 

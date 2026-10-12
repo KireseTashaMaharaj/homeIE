@@ -84,7 +84,7 @@ Defaults use a local SQLite file (`database.db`). Change `SECRET_KEY` before any
 
 ### 4. Initialise the database (Python CLI)
 
-Creates tables (drops existing by default) **and seeds demo users**:
+Creates tables (drops existing by default) and seeds homeIE demo accounts plus sample listings:
 
 ```bash
 python manage.py init
@@ -92,17 +92,20 @@ python manage.py init
 
 | Username | Password    | Role         |
 |----------|-------------|--------------|
-| `bob`    | `bobpass`   | regular_user |
 | `admin`  | `adminpass` | admin        |
+| `maria`  | `mariapass` | landlord     |
+| `dev`    | `devpass`   | landlord     |
+| `bob`    | `bobpass`   | student      |
+| `sara`   | `sarapass`  | student      |
 
 Flags:
 
 ```bash
-python manage.py init --no-drop   # create/seed without dropping
+python manage.py init --no-drop   # create/seed without dropping (does not migrate old schemas)
 python manage.py init --no-seed   # tables only (skip demo users)
 ```
 
-Seeding skips usernames that already exist. Add more rows in `cmd_seed` in `app/cli.py`. `python manage.py seed` still works if you only want to (re)insert demo users.
+`python manage.py init` drops and recreates the local database by default; back up any local data first. The seed command creates missing accounts, sample listings with bundled static images, and representative bookings when the booking table is empty. Existing listings for a demo landlord are left unchanged. `python manage.py seed` runs the seed without dropping tables.
 
 ```bash
 python manage.py users
@@ -129,8 +132,8 @@ Commands are implemented in `app/cli.py` (stdlib `argparse`) and invoked via `ma
 
 | Command | Purpose |
 |---------|---------|
-| `python manage.py init` | Drop (default), create DB tables, and seed demo users |
-| `python manage.py seed` | Insert demo users only (also part of `init`) |
+| `python manage.py init` | Drop (default), create DB tables, and seed homeIE demo accounts/listings |
+| `python manage.py seed` | Seed homeIE demo accounts/listings without dropping tables |
 | `python manage.py run` | Start Uvicorn (reload unless `ENV=production`) |
 | `python manage.py users` | Print users in the DB |
 | `python manage.py transcripts` | Optional: package agent-written `docs/transcripts/*.md` into INDEX + zip (no IDE scrape) |

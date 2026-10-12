@@ -4,9 +4,12 @@
 {% block content %}
 <div class="auth-shell">
   <div class="auth-panel">
-    <a class="auth-back" href="{{ url_for('index_view') }}">← Home</a>
-    <div class="brand-wordmark">FastStarter</div>
-    <p class="auth-tagline">Sign in to continue</p>
+    <a class="auth-logo" href="{{ url_for('index_view') }}">
+      <img src="{{ url_for('static', path='img/homeie-logo.png') }}"
+           alt="homeIE - Your Place, Your People">
+    </a>
+    <h1 class="auth-heading">Welcome back</h1>
+    <p class="auth-tagline">Sign in to find your place and your people.</p>
 
     <form method="POST" action="{{ url_for('login_action_ajax') }}">
       <div class="mb-3">

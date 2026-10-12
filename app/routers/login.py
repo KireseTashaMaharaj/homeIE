@@ -34,7 +34,11 @@ async def login_action_ajax(
         )
 
     user = user_repo.get_by_username(username)
-    dest = "admin_home_view" if user and user.role == "admin" else "user_home_view"
+    dest = "user_home_view"
+    if user and user.role == "admin":
+        dest = "admin_home_view"
+    elif user and user.role == "landlord":
+        dest = "landlord_listings_view"
     response = RedirectResponse(
         url=request.url_for(dest),
         status_code=status.HTTP_303_SEE_OTHER,

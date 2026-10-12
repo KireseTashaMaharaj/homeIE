@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" role="img" aria-labelledby="title">
+  <title id="title">Welcoming shared student flat with plants and a sofa</title>
+  <rect width="800" height="600" fill="#eae2ff"/>
+  <rect y="385" width="800" height="215" fill="#d8c9b8"/>
+  <rect x="520" y="72" width="210" height="240" rx="12" fill="#fff"/>
+  <rect x="540" y="92" width="170" height="200" fill="#b9ddf7"/>
+  <path d="M625 92v200M540 194h170" stroke="#fff" stroke-width="12"/>
+  <rect x="116" y="315" width="350" height="176" rx="30" fill="#9cbfba"/>
+  <rect x="91" y="406" width="400" height="62" rx="20" fill="#709c95"/>
+  <rect x="145" y="338" width="128" height="76" rx="18" fill="#fff"/>
+  <rect x="294" y="338" width="128" height="76" rx="18" fill="#c8b6f6"/>
+  <path d="M0 525c213-31 493 38 800-18v93H0z" fill="#c7b39b"/>
+  <path d="M603 385c-28-70-11-102 0-130 28 42 30 81 0 130z" fill="#4d8c68"/>
+  <path d="M642 386c13-71 44-93 70-110-3 50-24 83-70 110z" fill="#71a77a"/>
+  <path d="M575 387c-21-50-51-68-76-78 5 42 28 66 76 78z" fill="#83b48a"/>
+  <path d="M566 388h91l-12 88h-66z" fill="#c68c72"/>
+</svg>
