@@ -173,11 +173,11 @@ Service shape lives in [`render.yaml`](render.yaml) (Blueprint reference for the
    - `create_postgres` — name `faststarter-db`, plan `free`, region `oregon`, disk 1 GB
    - `create_web_service` — runtime `python`, plan `free`, **same region**, repo and branch, build `pip install -r requirements.txt`
 4. Set env vars on the web service (use the database **internal** connection string, not the external one):
-   - `DATABASE_URI` — internal Postgres URL
+   - `DATABASE_URL` — internal Postgres URL
    - `SECRET_KEY` — long random string
    - `ENV` — `production`
    - `PYTHON_VERSION` — `3.12.7`
-5. Start command (do not drop tables on each boot):
+5. Start command (do not drop tables on each boot). On the first boot against the new Postgres database, `init --no-drop` creates the tables and seeds the demo users, listings in each status, representative bookings (including past confirmed stays), and a demo review. It runs on every service start; existing tables are preserved and the seed avoids duplicating the demo listing/booking set:
 
 ```bash
 python manage.py init --no-drop && python manage.py run --host 0.0.0.0 --port $PORT

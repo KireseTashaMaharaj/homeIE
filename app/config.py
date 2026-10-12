@@ -1,9 +1,9 @@
-from functools import lru_cache
 import os
 import re
+from functools import lru_cache
 from pathlib import Path
 
-from pydantic import field_validator
+from pydantic import AliasChoices, Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 # Prefer a real .env; fall back to committed examples for first-run clones.
@@ -95,7 +95,9 @@ def mask_database_uri(uri: str) -> str:
 
 
 class Settings(BaseSettings):
-    database_uri: str
+    database_uri: str = Field(
+        validation_alias=AliasChoices("DATABASE_URL", "DATABASE_URI")
+    )
     secret_key: str
     env: str
     config_password: str = ""

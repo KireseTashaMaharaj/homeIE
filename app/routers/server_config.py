@@ -107,7 +107,7 @@ def _gather_config() -> dict:
         "ENV": settings.env,
         "APP_HOST": settings.app_host,
         "APP_PORT": settings.app_port,
-        "DATABASE_URI": mask_database_uri(settings.database_uri),
+        "DATABASE_URL": mask_database_uri(settings.database_uri),
         "SECRET_KEY": mask_secret(settings.secret_key),
         "CONFIG_PASSWORD": "(set)" if settings.config_password else "(unset)",
         "JWT_ALGORITHM": settings.jwt_algorithm,

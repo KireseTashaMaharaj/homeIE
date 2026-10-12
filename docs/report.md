@@ -341,9 +341,9 @@ note: Student's route snippet constructed ListingRepository and ListingService a
 
 ### Workflow 1 verification and polish
 
-The database was recreated with `python manage.py init`; seeding created four accounts and five listings (verified, rejected with reason, pending, and draft). The updated app is responding at `http://127.0.0.1:5001/` because port 5000 was already occupied. Student visual/behavior verification is still pending: check landlord drafts, submit and resubmit; admin approval and required-reason rejection; student visibility of verified listings only; and role-based login redirects. Add verification notes and any requested UI/model refinements after the student reports what they saw.
+The database was recreated with `python manage.py init`; seeding created the demo accounts and five listings (verified, rejected with reason, pending, and draft). The student later verified the landlord create-and-submit flow, admin approval and reasoned rejection, landlord edit/resubmission, and verified-listing visibility for students.
 
-Polish requested: admin verification continues to use the shared homeIE sidebar and welcome bar, with the admin label normalized to `Welcome, admin`; listing cards use “sleeps N” and grouped monthly prices; room type is limited to Private room, Shared room, Studio, and Shared flat (the demo seed values already match); Browse cards use wider columns and reserve space for the Verified badge; success flashes are soft green, while rejection and error flashes are soft red. Student verification of these polish changes is pending.
+Polish requested: admin verification continues to use the shared homeIE sidebar and welcome bar, with the admin label normalized to `Welcome, admin`; listing cards use “sleeps N” and grouped monthly prices; room type is limited to Private room, Shared room, Studio, and Shared flat (the demo seed values already match); Browse cards use wider columns and reserve space for the Verified badge; success flashes are soft green, while rejection and error flashes are soft red. The student reports local end-to-end verification of listing submission, admin approval/rejection, landlord resubmission, and student visibility.
 
 ### Workflow 2: Student booking request (with roommates)
 
@@ -437,7 +437,7 @@ The `sara` student account and seeded bookings cover pending roommates, pending 
 
 <!-- student-build:verification
 workflow: Student booking request (with roommates)
-status: implementation complete; student run-and-click verification pending
+status: student reports end-to-end local verification complete on 2026-10-12; filtered verified listings, dated booking request, roommate invitation and acceptance, landlord acceptance and reasoned decline, and status visible to participants
 -->
 
 ### Workflow 3: Post-stay review
@@ -495,18 +495,18 @@ Workflow 3 now supports eligible post-stay reviews with server-side service vali
 
 Workflow 2 polish adds count badges to all My Bookings tabs and Accept/Decline controls on pending roommate booking cards. Seed data now gives Bob and Sara past confirmed stays and seeds a review by Sara; Bob can test submitting one.
 
-Three new focused tests cover tenant/date eligibility, accepted-roommate submission and duplicate rejection, and rating/comment limits. The focused pytest suite passes (9 tests), the changed Jinja templates compile, and Ruff passes with `F841` ignored for a pre-existing unused listing assignment in `app/routers/listings.py`. Student run-and-click verification against the W3 wireframes remains pending. Re-run `python manage.py init` to recreate the demo data before testing; it resets the local database.
+Three new focused tests cover tenant/date eligibility, accepted-roommate submission and duplicate rejection, and rating/comment limits. The focused pytest suite passes (9 tests), the changed Jinja templates compile, and Ruff passes with `F841` ignored for a pre-existing unused listing assignment in `app/routers/listings.py`. The student reports a tenant review of a past confirmed stay, the updated listing average, and admin review removal. Re-run `python manage.py init` to recreate the demo data before testing; it resets the local database.
 
 <!-- student-build:verification
 workflow: Post-stay review and Workflow 2 polish
-status: implementation complete; automated checks passed; student run-and-click verification pending
+status: automated checks passed; student reports end-to-end local verification complete on 2026-10-12; a tenant reviewed a past confirmed stay, the listing rating average updated, and an admin removed a review
 -->
 
 ## Deployed app
 
-Phase 6. Public Render URL (not localhost). Markers open this to mark the three workflows.
+Phase 6 deployment is pending Render MCP resource creation. Approved plans: Free web service (`homeie`) and Free Postgres (`faststarter-db`), both in Oregon; $0/month base cost. The web service will receive `DATABASE_URL` from the database's internal connection string and a Render-generated `SECRET_KEY`. Its startup command runs `python manage.py init --no-drop` before starting the app, creating tables and seeding the demo accounts, listings in each status, representative bookings including past confirmed stays, and a demo review on first boot. Free Postgres expires after 30 days; the Free web service sleeps after 15 minutes without traffic.
 
-https://
+Public URL: pending deployment.
 
 ## Logins
 
