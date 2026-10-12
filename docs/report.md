@@ -1,8 +1,20 @@
+<!-- student-build:skill-integrity
+status: pass
+root: e84cd692d0b85eefe546385661958c27d07e8be6c5176a82012f68ccff5c8beb
+expected_root: e84cd692d0b85eefe546385661958c27d07e8be6c5176a82012f68ccff5c8beb
+mismatches: none
+-->
+
 # COMP 3613 Assignment 1
 
 Draft this file with the Guide. **Update it after every phase milestone** before you pause. The use-case diagram is a UML PNG at `docs/diagrams/use-case.png`, linked from this file as `diagrams/use-case.png` (path relative to `docs/report.md`). The model diagram is Mermaid. **Embed wireframe images** as `wireframes/<file>` (files live in `docs/wireframes/`).
 
-Do not put your student ID in this file if you will commit it. The PDF cover adds your name and ID at export time.
+## Student and submission details
+
+- **Student name:** Kirese Maharaj
+- **Student ID:** 816040048
+- **Public Render URL:** https://homeie.onrender.com/
+- **YouTube URL:** **PENDING UPLOAD — replace this placeholder with the public video URL after uploading.**
 
 ## Assigned project
 Student Accommodation — a marketplace for students near UWI St. Augustine to find secure rental listings, book alone or with roommates, and review stays.
@@ -277,6 +289,10 @@ image: docs/wireframes/w3-4-admin-remove-confirm.png
 covered: yes
 -->
 
+### homeie logo
+
+![homeie logo](wireframes/homeie-logo.png)
+
 ## Theming
 
 - **Brand:** homeIE — “Your Place, Your People”; friendly, playful, welcoming, and trustworthy for students and landlords.
@@ -504,9 +520,11 @@ status: automated checks passed; student reports end-to-end local verification c
 
 ## Deployed app
 
-Phase 6 deployment is pending Render MCP resource creation. Approved plans: Free web service (`homeie`) and Free Postgres (`faststarter-db`), both in Oregon; $0/month base cost. The web service will receive `DATABASE_URL` from the database's internal connection string and a Render-generated `SECRET_KEY`. Its startup command runs `python manage.py init --no-drop` before starting the app, creating tables and seeding the demo accounts, listings in each status, representative bookings including past confirmed stays, and a demo review on first boot. Free Postgres expires after 30 days; the Free web service sleeps after 15 minutes without traffic.
+Deployed on Render with the approved Free web service (`homeie`) and Free Postgres (`faststarter-db`) plans in Oregon; $0/month base cost. The web service connects through `DATABASE_URL` using the database's internal connection string, and Render generates `SECRET_KEY`. Startup runs `python manage.py init --no-drop` before launching the app; this creates tables and seeds the demo accounts, listings in each status, representative bookings including past confirmed stays, and a demo review on first boot. Free Postgres expires after 30 days; the Free web service sleeps after 15 minutes without traffic.
 
-Public URL: pending deployment.
+Public URL: https://homeie.onrender.com/
+
+Deployment check: `GET /health` returned `{"ok":true}` and the public landing page loaded on 2026-10-12. To troubleshoot, open the `homeie` service in the Render Dashboard and inspect **Logs**; for build failures, inspect the failed deploy's build logs. The Postgres service has its own **Logs** view.
 
 ## Logins
 
@@ -520,14 +538,98 @@ Every account a marker needs, including extra users you added. Starter accounts:
 
 ## YouTube URL
 
+**PENDING UPLOAD — replace this placeholder with the public video URL after uploading.**
+
 ## Session transcripts
 
-Filled when the Guide builds the report: the agent writes each Guide chat to `docs/transcripts/<slug>.md` (Copilot Agent, Cursor, or OpenCode). `python manage.py report` packages them. Do not paste chats here during the build.
+Filled when the Guide builds the report: the agent writes chat markdown into `docs/transcripts/`; `python manage.py report` packages them.
+
+Guide packaged **3** chat(s) in `docs/transcripts/` (and `docs/transcripts.zip`).
+
+Index: [docs/transcripts/INDEX.md](transcripts/INDEX.md)
+
+- [`phase-5-homeie-build`](transcripts/phase-5-homeie-build.md)
+- [`phase-6-render-deployment`](transcripts/phase-6-render-deployment.md)
+- [`report-build`](transcripts/report-build.md)
 
 ## Competency (student-judge)
 
-Filled when the report is built. Guide runs student-judge, writes `docs/judge.md`, and export appends the scorecard here.
+Filled by Guide from the student-judge run when this report was built.
+
+**Judged at:** 2026-10-12T19:04:00-04:00
+**Evidence pass:** re-read accessible native Copilot chats and current `docs/report.md`, wireframes, and diagrams; prior scorecards ignored. Separate Phase 1–4 native chats were not exposed in the available project sessions.
+
+**Student / session:** Kirese Maharaj / COMP 3613 Assignment 1 (HomeIE)
+**Artifact:** Accessible Copilot Agent Guide chats, current report and diagrams, and the Guide-written transcripts in `docs/transcripts/`
+**Phases in evidence:** 1–6 (COMP 3613; Phase 5 polish, Phase 6 deploy; never generic 0–5)
+
+### Totals
+| | Count / value |
+|--|--|
+| Metrics on rubric | 12 (M1–M12) |
+| N/A (excluded) | 0 |
+| Metrics scored | 12 |
+| Scoreable max | 12 × 4 |
+| Awarded total | 46 / 48 |
+| **Overall (avg of scored)** | **3.8 / 4** |
+| Impression mark | 19 / 20 |
+
+## Scorecard
+
+| ID | Metric | Score / 4 | In avg | Evidence |
+|----|--------|----------:|:------:|----------|
+| M1 | Phase discipline | 4 | yes | Phase 5 work, student verification, and polish precede the Phase 6 Render deployment; report records separate workflow milestones and local verification. |
+| M2 | Problem framing | 3 | yes | The report contains the three named workflows, ERD, relationships, and all wireframes; no separate Phase 1–4 chats were accessible for checking the original steering turns. |
+| M3 | Decision ownership | 4 | yes | Student chose specific model/UI behavior and later asked for targeted review polish, including: “Don’t change any logic, only templates/CSS.” |
+| M4 | Artefact-before-code | 4 | yes | Report includes the ERD and all W1–W3 wireframes; student directed Workflow 1 to use the Phase 3 model “as-is” and the corresponding wireframes. |
+| M5 | Verification habit | 4 | yes | Report records student-reported local verification for listing, booking, and review flows, including observed outcomes and later polish. |
+| M6 | Assignment fit | 4 | yes | Report records the ERD-based implementation, seeded FastStarter auth, and layered services/repositories; code-check notes document thin routes and `architecture_ok: yes`. |
+| M7 | Slice explanation | 4 | yes | Student correctly identified Service ownership for booking transitions and review eligibility; required model, repository/service, and thin-route snippet attempts are recorded. |
+| M8 | Prompt quality | 4 | yes | Student supplied phase- and workflow-scoped implementation prompts, such as “Build Workflow 2 using the existing Booking and BookingTenant models” and precise expected behavior. |
+| M9 | Response to pushback | 4 | yes | Student continued beyond initial builds with Workflow 1 polish, booking-tab polish, and detailed review-star/verified-stay refinements. |
+| M10 | Integrity | 4 | yes | No paste-back, transcript-gaming, or edited-skill evidence appeared in the accessible chats; the student explicitly required that database passwords and API keys be excluded. |
+| M11 | Provenance continuity | 3 | yes | Workflow prompts and implementation remain anchored to the HomeIE model, wireframes, and seeded accounts; unavailable Phase 1–4 chats limit direct continuity review. |
+| M12 | Sincerity trajectory | 4 | yes | No suspicion protocol was needed; accessible student turns consistently specify domain behavior and bounded UI refinements. |
+
+## Strengths
+- Student-authored workflows, model decisions, wireframes, and theming provide a coherent source for the implementation.
+- Student completed and refined code-check snippets across model, repository/service, and router layers; the recorded routes delegate without inline persistence.
+- Student repeatedly verified locally and requested refinements after the initial builds, including review UI-only polish.
+- Render deployment and marker logins are recorded; report notes a successful public landing-page and `/health` check.
+
+## Gaps (priority order)
+1. The YouTube URL is not available until the student uploads the video. A clearly marked placeholder is present in the report and PDF cover; replace it and re-export afterward.
+2. Separate native Phase 1–4 chats were not available in the sessions accessible to this report build. The phase artefacts are present in `docs/report.md`; this is an evidence availability note, not a student competency deduction.
+
+## Phase gate status
+| Phase | Status | Note |
+|-------|--------|------|
+| 1 | met | Assigned project and three named workflows are recorded in the report. |
+| 2 | met | Use-case diagram and notes are present. |
+| 3 | met | Student-owned ERD, relationships, and model rules are present. |
+| 4 | met | W1–W3 wireframe images and use-case coverage are embedded. |
+| 5 | met | Theme, per-workflow implementation, student verification, and continued UI/workflow polish are recorded. |
+| 6 | met | Public Render URL, deployment notes, and seeded marker logins are recorded. |
+
+## Recommended next practice
+- After uploading the assignment video, replace the YouTube placeholder in `docs/report.md` and regenerate the PDF package.
+
+## Integrity note
+- Clean: no accessible evidence of external-LLM paste-back, transcript gaming, or edited course skills.
+
+## Provenance flags
+- Separate Phase 1–4 native chats were not available to this run; report artefacts were used as supporting evidence. No other flags.
+
+## Sincerity log summary
+- Blocks found: 0 | max round: none | min/mean/final confidence: N/A | trend: none | cleared: yes (no suspicion spiral needed)
+
+## Skips
+- Skips: 0/3 used.
 
 ## Skill integrity
 
-Filled by `python manage.py report`. Do not edit the course skills.
+Course skills are hashed at export and compared to `.agents/skills.lock.json`. Do not edit `.agents/skills/`, `.cursor/skills/`, or `AGENTS.md`.
+
+- Status: **pass**
+- Root: `e84cd692d0b85eefe546385661958c27d07e8be6c5176a82012f68ccff5c8beb`
+- none

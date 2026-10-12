@@ -232,7 +232,15 @@ def export_report(
 
     pdf = _new_pdf(bool(missing))
     with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as tmp:
-        cover = _cover_html(clean_name, clean_id, app_url, logins, integrity, missing)
+        cover = _cover_html(
+            clean_name,
+            clean_id,
+            app_url,
+            logins,
+            _youtube_url(markdown),
+            integrity,
+            missing,
+        )
         body = _markdown_to_html(markdown, src.parent, Path(tmp))
         appendix = _markdown_to_html(
             appendix_markdown(transcripts),
@@ -582,6 +590,7 @@ def _cover_html(
     student_id: str,
     app_url: str,
     logins: str,
+    youtube_url: str,
     integrity: IntegrityResult,
     missing: list[str],
 ) -> str:
@@ -597,6 +606,7 @@ def _cover_html(
         ("Student ID", html_lib.escape(student_id), False),
         ("Deployed app", html_lib.escape(app_url), False),
         ("Logins", login_html, False),
+        ("YouTube URL", html_lib.escape(youtube_url), False),
         ("Skill integrity", integrity_value, not integrity.ok),
     ]
     cells = []
@@ -631,6 +641,11 @@ def _cover_html(
 {missing_note}
 <p><font size="2" color="#5A6070">The YouTube video must show this name and must not show or say this ID. App logins belong in this report. Database passwords do not.</font></p>
 """
+
+
+def _youtube_url(markdown: str) -> str:
+    youtube = _section(markdown, "youtube url", "youtube video")
+    return youtube or "PENDING UPLOAD — add the public YouTube URL here."
 
 
 def _section(markdown: str, *titles: str) -> str:

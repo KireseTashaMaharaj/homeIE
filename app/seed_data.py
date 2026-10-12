@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta, timezone
+from datetime import date, datetime, timedelta, timezone
 
 from sqlmodel import select
 
@@ -90,6 +90,71 @@ DEMO_LISTINGS = (
     },
 )
 
+PAST_BOOKING_FIXTURES = (
+    {
+        "listing": "Room near campus",
+        "booker": "bob",
+        "move_in": date(2025, 1, 10),
+        "move_out": date(2025, 3, 10),
+    },
+    {
+        "listing": "Shared flat, 3 bedroom",
+        "booker": "bob",
+        "move_in": date(2025, 4, 10),
+        "move_out": date(2025, 6, 10),
+    },
+    {
+        "listing": "Courtyard student suite",
+        "booker": "sara",
+        "move_in": date(2025, 7, 10),
+        "move_out": date(2025, 9, 10),
+    },
+)
+
+
+def _seed_past_confirmed_bookings(session, users, verified_listings) -> None:
+    booking_repo = BookingRepository(session)
+    for fixture in PAST_BOOKING_FIXTURES:
+        listing = verified_listings.get(fixture["listing"])
+        booker = users[fixture["booker"]]
+        if (
+            listing is None
+            or listing.id is None
+            or listing.status != "verified"
+            or booker.id is None
+        ):
+            raise RuntimeError("Past booking seed data requires verified listings and users.")
+
+        existing_id = session.exec(
+            select(Booking.id).where(
+                Booking.listingId == listing.id,
+                Booking.bookerId == booker.id,
+                Booking.moveInDate == fixture["move_in"],
+                Booking.moveOutDate == fixture["move_out"],
+                Booking.status == "confirmed",
+            )
+        ).first()
+        if existing_id is not None:
+            continue
+
+        booking = Booking(
+            listingId=listing.id,
+            bookerId=booker.id,
+            moveInDate=fixture["move_in"],
+            moveOutDate=fixture["move_out"],
+            status="confirmed",
+        )
+        booking_repo.create(
+            booking,
+            [
+                BookingTenant(
+                    userId=booker.id,
+                    tenantRole="booker",
+                    response="accepted",
+                )
+            ],
+        )
+
 
 def seed_homeie() -> None:
     """Create the homeIE marker accounts and a small, repeatable listing set."""
@@ -164,6 +229,40 @@ def seed_homeie() -> None:
             listings_created += 1
             if data["owner"] == "dev" and data["state"] == "draft":
                 seeded_landlords.add(landlord.id)
+
+        dev = users["dev"]
+        if dev.id is None:
+            raise RuntimeError("The Dev account has no ID for listing seed data.")
+        extra_listing = session.exec(
+            select(Listing).where(
+                Listing.landlordId == dev.id,
+                Listing.title == "Courtyard student suite",
+            )
+        ).first()
+        if extra_listing is None:
+            extra_listing = listing_service.create_listing(
+                landlord_id=dev.id,
+                values={
+                    "title": "Courtyard student suite",
+                    "address": "31 Orchid Way, Tunapuna",
+                    "distance_to_campus": "1.0",
+                    "price": "2900",
+                    "room_type": "Studio",
+                    "capacity": "1",
+                    "amenities": "WiFi, kitchenette, private bath",
+                    "description": "A quiet studio with a private bath and courtyard access.",
+                },
+                photo_urls="/static/img/listings/courtyard-room.svg",
+                submit=True,
+            )
+            extra_listing = listing_service.moderate_listing(
+                extra_listing.id,
+                approved=True,
+            )
+        elif extra_listing.status != "verified":
+            raise RuntimeError(
+                "The seeded Courtyard student suite exists but is not verified."
+            )
 
         booking_exists = session.exec(select(Booking.id).limit(1)).first()
         if not booking_exists:
@@ -289,6 +388,14 @@ def seed_homeie() -> None:
                     )
                 )
                 session.commit()
+
+        verified_listings = {
+            listing.title: listing
+            for listing in session.exec(
+                select(Listing).where(Listing.status == "verified")
+            ).all()
+        }
+        _seed_past_confirmed_bookings(session, users, verified_listings)
 
     print(
         f"Seed done — created {created} accounts, updated {updated}, "
