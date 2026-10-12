@@ -51,5 +51,40 @@
       </form>
     </aside>
   </div>
+
+  <section class="booking-panel listing-reviews mt-4" aria-labelledby="listing-reviews-heading">
+    <div class="d-flex flex-wrap align-items-baseline gap-2 mb-3">
+      <h2 class="h4 mb-0" id="listing-reviews-heading">Reviews</h2>
+      {% if review_data.count %}
+      <p class="listing-rating mb-0">
+        {% set rounded_average = review_data.average|round|int %}
+        <span class="rating-stars" aria-hidden="true">{% for star in range(1, 6) %}<span class="{{ 'star-filled' if star <= rounded_average else 'star-empty' }}">{{ "★" if star <= rounded_average else "☆" }}</span>{% endfor %}</span>
+        {{ "%.1f"|format(review_data.average) }} / 5
+        <span class="text-secondary">· {{ review_data.count }} {{ "review" if review_data.count == 1 else "reviews" }}</span>
+      </p>
+      {% else %}
+      <p class="text-secondary mb-0">No reviews yet</p>
+      {% endif %}
+    </div>
+    {% for entry in review_data.reviews %}
+    <article class="review-entry">
+      <div class="d-flex flex-wrap justify-content-between gap-2">
+        <div class="review-author">
+          <strong>{{ entry.first_name }}</strong>
+          <span class="verified-stay-tag">Verified stay</span>
+        </div>
+        <time class="text-secondary" datetime="{{ entry.review.createdAt.isoformat() }}">{{ entry.review.createdAt.strftime("%b %d, %Y") }}</time>
+      </div>
+      <p class="review-stars mb-1" aria-label="{{ entry.review.rating }} out of 5 stars">
+        {% for star in range(1, 6) %}<span class="{{ 'star-filled' if star <= entry.review.rating else 'star-empty' }}" aria-hidden="true">{{ "★" if star <= entry.review.rating else "☆" }}</span>{% endfor %}
+      </p>
+      <p class="mb-0">{{ entry.review.comment }}</p>
+    </article>
+    {% else %}
+      {% if review_data.count %}
+      <p class="mb-0">No visible reviews.</p>
+      {% endif %}
+    {% endfor %}
+  </section>
 </main>
 {% endblock %}

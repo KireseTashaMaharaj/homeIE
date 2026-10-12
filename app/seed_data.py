@@ -5,6 +5,7 @@ from sqlmodel import select
 from app.database import ensure_db_and_tables, get_cli_session
 from app.models.booking import Booking, BookingTenant
 from app.models.listing import Listing
+from app.models.review import Review
 from app.models.user import UserBase
 from app.repositories.booking import BookingRepository
 from app.repositories.listing import ListingRepository
@@ -224,6 +225,14 @@ def seed_homeie() -> None:
                     "move_in": today - timedelta(days=120),
                     "move_out": today - timedelta(days=30),
                 },
+                {
+                    "listing": "Room near campus",
+                    "booker": "bob",
+                    "roommates": [],
+                    "status": "confirmed",
+                    "move_in": today - timedelta(days=100),
+                    "move_out": today - timedelta(days=20),
+                },
             )
             for fixture in fixtures:
                 listing = seeded_listings.get(fixture["listing"])
@@ -257,6 +266,29 @@ def seed_homeie() -> None:
                         )
                     )
                 booking_repo.create(booking, tenants)
+
+            sara = users["sara"]
+            if sara.id is None:
+                raise RuntimeError("Review seed data requires the Sara account.")
+            past_sara_booking = session.exec(
+                select(Booking)
+                .where(
+                    Booking.bookerId == sara.id,
+                    Booking.status == "confirmed",
+                    Booking.moveOutDate < today,
+                )
+                .order_by(Booking.moveOutDate.desc())
+            ).first()
+            if past_sara_booking is not None and past_sara_booking.id is not None:
+                session.add(
+                    Review(
+                        bookingId=past_sara_booking.id,
+                        reviewerId=sara.id,
+                        rating=5,
+                        comment="Bright room, kind landlord, and an easy trip to campus.",
+                    )
+                )
+                session.commit()
 
     print(
         f"Seed done — created {created} accounts, updated {updated}, "

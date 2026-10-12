@@ -4,13 +4,15 @@ import pytest
 from sqlalchemy.pool import StaticPool
 from sqlmodel import Session, SQLModel, create_engine
 
-from app.models.booking import Booking
+from app.models.booking import Booking, BookingTenant
 from app.models.listing import Listing
 from app.models.user import User
 from app.repositories.booking import BookingRepository
 from app.repositories.listing import ListingRepository
+from app.repositories.review import ReviewRepository
 from app.repositories.user import UserRepository
 from app.services.booking_service import BookingService
+from app.services.review_service import ReviewService
 
 
 @pytest.fixture
@@ -99,6 +101,49 @@ def request_booking(context, roommate_names: list[str] | None = None) -> Booking
         move_out_date=datetime.now(timezone.utc).date() + timedelta(days=120),
         roommate_usernames=roommate_names or [],
         message="",
+    )
+
+
+def create_past_stay(context, roommate=None, move_out_date=None) -> Booking:
+    db = context["db"]
+    today = datetime.now(timezone.utc).date()
+    booking = Booking(
+        listingId=context["listing"].id,
+        bookerId=context["student"].id,
+        moveInDate=today - timedelta(days=90),
+        moveOutDate=move_out_date or today - timedelta(days=10),
+        status="confirmed",
+    )
+    db.add(booking)
+    db.flush()
+    db.add(
+        BookingTenant(
+            bookingId=booking.id,
+            userId=context["student"].id,
+            tenantRole="booker",
+            response="accepted",
+        )
+    )
+    if roommate is not None:
+        db.add(
+            BookingTenant(
+                bookingId=booking.id,
+                userId=roommate.id,
+                tenantRole="roommate",
+                response="accepted",
+            )
+        )
+    db.commit()
+    db.refresh(booking)
+    return booking
+
+
+def review_service(context) -> ReviewService:
+    db = context["db"]
+    return ReviewService(
+        ReviewRepository(db),
+        BookingRepository(db),
+        UserRepository(db),
     )
 
 
@@ -220,4 +265,88 @@ def test_only_booker_can_cancel_and_verified_listings_are_required(booking_conte
         booking_context["service"].get_verified_listing(
             booking_context["listing"].id,
             booking_context["student"],
+        )
+
+
+def test_only_a_tenant_on_a_past_confirmed_booking_can_review(booking_context):
+    booking = create_past_stay(booking_context)
+    service = review_service(booking_context)
+
+    with pytest.raises(ValueError, match="Only tenants"):
+        service.create_review(
+            booking.id,
+            booking_context["roommate"],
+            5,
+            "A lovely place and a very kind landlord.",
+        )
+
+    upcoming = create_past_stay(
+        booking_context,
+        move_out_date=datetime.now(timezone.utc).date() + timedelta(days=1),
+    )
+    with pytest.raises(ValueError, match="after your move-out"):
+        service.create_review(
+            upcoming.id,
+            booking_context["student"],
+            5,
+            "A lovely place and a very kind landlord.",
+        )
+
+    landlord = booking_context["landlord"]
+    with pytest.raises(ValueError, match="Only students"):
+        service.create_review(
+            booking.id,
+            landlord,
+            5,
+            "A lovely place and a very kind landlord.",
+        )
+
+
+def test_accepted_roommate_can_review_and_only_once(booking_context):
+    booking = create_past_stay(booking_context, booking_context["roommate"])
+    service = review_service(booking_context)
+
+    review = service.create_review(
+        booking.id,
+        booking_context["roommate"],
+        4,
+        "A comfortable room with a very helpful landlord.",
+    )
+
+    assert review.bookingId == booking.id
+    assert review.reviewerId == booking_context["roommate"].id
+    assert review.isRemoved is False
+    with pytest.raises(ValueError, match="already reviewed"):
+        service.create_review(
+            booking.id,
+            booking_context["roommate"],
+            5,
+            "Trying to add a second review for the same stay.",
+        )
+
+
+def test_review_rating_and_comment_limits_are_enforced(booking_context):
+    booking = create_past_stay(booking_context)
+    service = review_service(booking_context)
+
+    with pytest.raises(ValueError, match="between 1 and 5"):
+        service.create_review(
+            booking.id,
+            booking_context["student"],
+            6,
+            "A lovely place and a very kind landlord.",
+        )
+    with pytest.raises(ValueError, match="at least 20"):
+        service.create_review(
+            booking.id,
+            booking_context["student"],
+            5,
+            "Too short",
+        )
+    with pytest.raises(ValueError, match="1000 characters or fewer"):
+        service.create_review(
+            booking.id,
+            booking_context["student"],
+            5,
+            "x" * 1001,
         )

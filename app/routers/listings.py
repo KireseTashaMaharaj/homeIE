@@ -3,9 +3,14 @@ from fastapi.responses import HTMLResponse, RedirectResponse
 from starlette import status
 
 from app.dependencies import AuthDep, SessionDep
+from app.repositories.booking import BookingRepository
 from app.repositories.listing import ListingRepository
+from app.repositories.review import ReviewRepository
+from app.repositories.user import UserRepository
 from app.services.listing_service import LISTING_STATUSES, ROOM_TYPES, ListingService
+from app.services.review_service import ReviewService
 from app.utilities.flash import flash
+
 from . import router, templates
 
 
@@ -49,6 +54,11 @@ def landlord_listings_view(
     _require_role(user, "landlord")
     service = _service(db)
     listings = service.get_landlord_listings(user.id)
+    reviews = ReviewService(
+        ReviewRepository(db),
+        BookingRepository(db),
+        UserRepository(db),
+    )
     active_status = request.query_params.get("status", "all")
     if active_status in LISTING_STATUSES:
         listings = [listing for listing in listings if listing.status == active_status]
@@ -61,6 +71,7 @@ def landlord_listings_view(
             "user": user,
             "listings": listings,
             "photos": service.get_listing_photos_for(listings),
+            "review_summaries": reviews.get_listing_summaries(listings),
             "statuses": LISTING_STATUSES,
             "active_status": active_status,
         },

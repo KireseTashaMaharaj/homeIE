@@ -10,7 +10,9 @@
   </div>
   <nav class="listing-status-tabs mb-4" aria-label="Booking tabs">
     {% for key, label in [("active", "Active"), ("confirmed", "Confirmed"), ("closed", "Past / Closed"), ("invitations", "Invitations")] %}
-    <a class="listing-status-tab {{ 'active' if tab == key }}" href="{{ url_for('my_bookings_view').include_query_params(tab=key) }}">{{ label }}</a>
+    <a class="listing-status-tab {{ 'active' if tab == key }}" href="{{ url_for('my_bookings_view').include_query_params(tab=key) }}">
+      {{ label }} <span class="booking-tab-count">{{ booking_tab_counts[key] }}</span>
+    </a>
     {% endfor %}
   </nav>
 
@@ -45,7 +47,7 @@
   {% else %}
     {% set visible = [] %}
     {% for item in bookings %}
-      {% if (tab == "active" and item.booking.status in ["pending_roommates", "pending_landlord"]) or (tab == "confirmed" and item.booking.status == "confirmed") or (tab == "closed" and item.booking.status in ["declined", "cancelled"]) %}
+      {% if (tab == "active" and item.booking.status in ["pending_roommates", "pending_landlord"]) or (tab == "confirmed" and item.booking.status == "confirmed" and item.booking.moveOutDate >= today) or (tab == "closed" and (item.booking.status in ["declined", "cancelled"] or (item.booking.status == "confirmed" and item.booking.moveOutDate < today))) %}
         {% set _ = visible.append(item) %}
       {% endif %}
     {% endfor %}
@@ -66,6 +68,23 @@
             {{ person.user.fullName or person.user.username }} ({{ "lead tenant" if person.tenant.tenantRole == "booker" else ("invitation closed" if item.booking.status == "cancelled" and person.tenant.response == "pending" else "roommate: " ~ person.tenant.response) }}){% if not loop.last %}, {% endif %}
           {% endfor %}
         </p>
+        {% if item.booking.status == "pending_roommates" %}
+          {% for person in item.tenants %}
+            {% if person.user.id == user.id and person.tenant.tenantRole == "roommate" and person.tenant.response == "pending" %}
+            <p class="text-secondary mb-2">You have been invited to join this booking.</p>
+            <div class="d-flex flex-wrap gap-2 mb-3">
+              <form method="post" action="{{ url_for('booking_invitation_action', booking_id=item.booking.id) }}">
+                <input type="hidden" name="decision" value="accept">
+                <button class="btn btn-primary btn-sm" type="submit">Accept invitation</button>
+              </form>
+              <form method="post" action="{{ url_for('booking_invitation_action', booking_id=item.booking.id) }}">
+                <input type="hidden" name="decision" value="decline">
+                <button class="btn btn-outline-secondary btn-sm" type="submit">Decline invitation</button>
+              </form>
+            </div>
+            {% endif %}
+          {% endfor %}
+        {% endif %}
         {% for person in item.tenants %}
           {% if person.tenant.response == "declined" %}
           <p class="booking-reason mb-2"><strong>{{ person.user.fullName or person.user.username }}</strong> declined the roommate invitation.</p>
@@ -81,6 +100,29 @@
         <form method="post" action="{{ url_for('booking_cancel_action', booking_id=item.booking.id) }}">
           <button class="btn btn-outline-secondary btn-sm" type="submit">Cancel request</button>
         </form>
+        {% endif %}
+        {% if item.booking.status == "confirmed" and item.booking.moveOutDate < today %}
+          {% if item.booking.id in reviewed_booking_ids %}
+          <span class="btn btn-outline-secondary btn-sm disabled" aria-disabled="true">Reviewed</span>
+          {% else %}
+          <details class="review-form-disclosure mt-3">
+            <summary class="btn btn-primary btn-sm">Leave a review</summary>
+            <form class="review-form mt-3" method="post" action="{{ url_for('review_create_action', booking_id=item.booking.id) }}">
+              <fieldset class="mb-3">
+                <legend class="form-label">Your rating</legend>
+                <div class="star-rating" role="radiogroup" aria-label="Your rating">
+                  {% for stars in range(1, 6) %}
+                  <input id="rating-{{ item.booking.id }}-{{ stars }}" type="radio" name="rating" value="{{ stars }}" required aria-label="{{ stars }} {{ 'star' if stars == 1 else 'stars' }}">
+                  <label for="rating-{{ item.booking.id }}-{{ stars }}" title="{{ stars }} {{ 'star' if stars == 1 else 'stars' }}" aria-hidden="true">★</label>
+                  {% endfor %}
+                </div>
+              </fieldset>
+              <label class="form-label" for="comment-{{ item.booking.id }}">Your comment</label>
+              <textarea class="form-control mb-3" id="comment-{{ item.booking.id }}" name="comment" minlength="20" maxlength="1000" required placeholder="Write about your stay..."></textarea>
+              <button class="btn btn-primary" type="submit">Submit review</button>
+            </form>
+          </details>
+          {% endif %}
         {% endif %}
       </article>
       {% else %}

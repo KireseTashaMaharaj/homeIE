@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, datetime, timezone
 from typing import Annotated
 
 from fastapi import Form, HTTPException, Request
@@ -8,8 +8,10 @@ from starlette import status
 from app.dependencies import AuthDep, SessionDep
 from app.repositories.booking import BookingRepository
 from app.repositories.listing import ListingRepository
+from app.repositories.review import ReviewRepository
 from app.repositories.user import UserRepository
 from app.services.booking_service import BookingService
+from app.services.review_service import ReviewService
 from app.utilities.flash import flash
 
 from . import router, templates
@@ -19,6 +21,14 @@ def _service(db: SessionDep) -> BookingService:
     return BookingService(
         BookingRepository(db),
         ListingRepository(db),
+        UserRepository(db),
+    )
+
+
+def _review_service(db: SessionDep) -> ReviewService:
+    return ReviewService(
+        ReviewRepository(db),
+        BookingRepository(db),
         UserRepository(db),
     )
 
@@ -98,6 +108,7 @@ def listing_detail_view(
             "user": user,
             "listing": listing,
             "photos": photos,
+            "review_data": _review_service(db).get_listing_data(listing_id),
         },
     )
 
@@ -117,14 +128,44 @@ def my_bookings_view(
     tab = request.query_params.get("tab", "active")
     if tab not in {"active", "confirmed", "closed", "invitations"}:
         tab = "active"
+    bookings = service.get_student_bookings(user)
+    invitations = service.get_pending_invitations(user)
+    today = datetime.now(timezone.utc).date()
+    counts = {
+        "active": sum(
+            item["booking"].status in {"pending_roommates", "pending_landlord"}
+            for item in bookings
+        ),
+        "confirmed": sum(
+            item["booking"].status == "confirmed"
+            and item["booking"].moveOutDate >= today
+            for item in bookings
+        ),
+        "closed": sum(
+            item["booking"].status in {"declined", "cancelled"}
+            or (
+                item["booking"].status == "confirmed"
+                and item["booking"].moveOutDate < today
+            )
+            for item in bookings
+        ),
+        "invitations": len(invitations),
+    }
+    try:
+        reviewed_booking_ids = _review_service(db).get_reviewed_booking_ids(user)
+    except ValueError as exc:
+        raise HTTPException(status_code=403, detail=str(exc)) from exc
     return templates.TemplateResponse(
         request=request,
         name="my-bookings.html",
         context={
             "user": user,
             "tab": tab,
-            "bookings": service.get_student_bookings(user),
-            "invitations": service.get_pending_invitations(user),
+            "bookings": bookings,
+            "invitations": invitations,
+            "booking_tab_counts": counts,
+            "reviewed_booking_ids": reviewed_booking_ids,
+            "today": today,
         },
     )
 

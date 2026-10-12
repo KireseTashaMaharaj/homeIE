@@ -621,6 +621,139 @@ a:hover {
   color: var(--status-rejected-ink);
 }
 
+.booking-tab-count {
+  display: inline-flex;
+  min-width: 1.4rem;
+  height: 1.4rem;
+  align-items: center;
+  justify-content: center;
+  margin-left: 0.3rem;
+  padding: 0 0.35rem;
+  border-radius: 999px;
+  background: var(--brand-lavender);
+  color: var(--brand-ink);
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.listing-rating,
+.review-stars {
+  font-weight: 700;
+}
+
+.rating-stars {
+  display: inline-flex;
+  gap: 0.06em;
+  margin-right: 0.25rem;
+  white-space: nowrap;
+}
+
+.star-filled {
+  color: #ffc107;
+}
+
+.star-empty {
+  color: #c5c7cc;
+}
+
+.review-stars {
+  font-size: 1.1rem;
+  letter-spacing: 0.04em;
+}
+
+.review-author {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.verified-stay-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.16rem 0.55rem;
+  border: 1px solid #8dc9b5;
+  border-radius: 999px;
+  background: var(--status-confirmed-bg);
+  color: var(--status-confirmed-ink);
+  font-size: 0.74rem;
+  font-weight: 700;
+}
+
+.review-entry {
+  padding: 1rem 0;
+  border-top: 1px solid var(--brand-border);
+}
+
+.review-form-disclosure > summary {
+  display: inline-flex;
+  cursor: pointer;
+  list-style: none;
+}
+
+.review-form-disclosure > summary::-webkit-details-marker {
+  display: none;
+}
+
+.review-form {
+  max-width: 38rem;
+  padding: 1rem;
+  border: 1px solid var(--brand-border);
+  border-radius: var(--brand-radius-sm);
+  background: var(--brand-blue);
+}
+
+.review-form textarea {
+  min-height: 8rem;
+}
+
+.review-form fieldset {
+  padding: 0;
+  border: 0;
+}
+
+.star-rating {
+  display: flex;
+  flex-direction: row-reverse;
+  justify-content: flex-end;
+  width: fit-content;
+  gap: 0.15rem;
+}
+
+.star-rating input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  clip-path: inset(50%);
+}
+
+.star-rating label {
+  color: #c5c7cc;
+  cursor: pointer;
+  font-size: 2rem;
+  line-height: 1;
+  transition: color 0.12s ease, transform 0.12s ease;
+}
+
+.star-rating label:hover,
+.star-rating label:hover ~ label,
+.star-rating input:checked + label,
+.star-rating input:checked + label ~ label {
+  color: #ffc107;
+}
+
+.star-rating label:hover {
+  transform: scale(1.12);
+}
+
+.star-rating input:focus-visible + label {
+  border-radius: 0.2rem;
+  outline: 3px solid #725bb2;
+  outline-offset: 2px;
+}
+
 .listing-back-link {
   color: #554783;
   font-weight: 600;

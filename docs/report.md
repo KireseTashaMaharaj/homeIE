@@ -114,6 +114,7 @@ Model rules:
 - `User.role` is `student`, `landlord`, or `admin`; listing and booking lifecycle values follow the statuses in the workflows.
 - Every booking has exactly one booker `BookingTenant` whose `userId` matches `Booking.bookerId`; roommate rows are additional tenants.
 - A reviewer can review a booking only once. A listing's reviews are reached through its bookings; `Review` has no `listingId`.
+- The implementation enforces one review per `(bookingId, reviewerId)` with a database uniqueness constraint; removed reviews are hidden from listing averages but still count as already submitted.
 - Photo and amenities storage formats are not specified by the model; preserve them without adding domain fields.
 
 ## Wireframes
@@ -437,6 +438,68 @@ The `sara` student account and seeded bookings cover pending roommates, pending 
 <!-- student-build:verification
 workflow: Student booking request (with roommates)
 status: implementation complete; student run-and-click verification pending
+-->
+
+### Workflow 3: Post-stay review
+
+Started from the Phase 3 Review entity and W3 wireframes. Student chose service-level review eligibility decisions. Review comments will use a required 20–1000 character range; this is a workflow detail, not a new model field.
+
+<!-- student-build:code-check
+workflow: Post-stay review
+form: mcq
+layer: service
+architecture_ok: yes
+implement_confidence: 0.80
+passed: yes
+note: Correctly chose the service to coordinate eligibility and reject unauthorized review attempts.
+-->
+
+<!-- student-build:code-check
+workflow: Post-stay review
+form: snippet
+layer: model
+architecture_ok: yes
+implement_confidence: 0.55
+passed: partial
+note: Student added the ERD fields and uniqueness rule; required comment nullability needed a final correction.
+-->
+<!-- student-build:code-check
+workflow: Post-stay review
+form: snippet
+layer: repository
+architecture_ok: yes
+implement_confidence: 0.55
+passed: yes
+note: Student queried by both booking and reviewer IDs and returned the first match.
+-->
+<!-- student-build:code-check
+workflow: Post-stay review
+form: snippet
+layer: service
+architecture_ok: yes
+implement_confidence: 0.55
+passed: yes
+note: Student implemented role, booking, tenant response, move-out, duplicate, rating, and comment validation in the service.
+-->
+<!-- student-build:code-check
+workflow: Post-stay review
+form: snippet
+layer: router
+architecture_ok: yes
+implement_confidence: 0.55
+passed: yes
+note: Student's thin route delegates to ReviewService and redirects with feedback; no persistence logic is in the handler.
+-->
+
+Workflow 3 now supports eligible post-stay reviews with server-side service validation and a database uniqueness constraint. The student form appears for past confirmed stays; submitted reviews show as Reviewed. Listing details show newest-first reviews, reviewer first names, dates, average, and count; Browse and My Listings show average/count. Removed reviews are excluded from public summaries.
+
+Workflow 2 polish adds count badges to all My Bookings tabs and Accept/Decline controls on pending roommate booking cards. Seed data now gives Bob and Sara past confirmed stays and seeds a review by Sara; Bob can test submitting one.
+
+Three new focused tests cover tenant/date eligibility, accepted-roommate submission and duplicate rejection, and rating/comment limits. The focused pytest suite passes (9 tests), the changed Jinja templates compile, and Ruff passes with `F841` ignored for a pre-existing unused listing assignment in `app/routers/listings.py`. Student run-and-click verification against the W3 wireframes remains pending. Re-run `python manage.py init` to recreate the demo data before testing; it resets the local database.
+
+<!-- student-build:verification
+workflow: Post-stay review and Workflow 2 polish
+status: implementation complete; automated checks passed; student run-and-click verification pending
 -->
 
 ## Deployed app
