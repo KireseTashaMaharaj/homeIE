@@ -1,0 +1,12 @@
+$kind: http-request
+name: decline w/ no reason
+url: "{{base_url}}/api/bookings/{{booking_b}}/decision"
+method: POST
+body:
+  type: json
+  content: '{"decision":"decline","decline_reason":""}'
+scripts:
+  - type: afterResponse
+    code: pm.test("400 reason required", () => pm.response.to.have.status(400));
+    language: text/javascript
+order: 23000

@@ -1,0 +1,15 @@
+$kind: http-request
+url: "{{base_url}}/api/bookings/{{booking_v}}/reviews"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: '{"rating":9,"comment":"Lovely room and the landlord was very helpful."}'
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("400 bad rating", () => pm.response.to.have.status(400));
+      pm.test("says 1 and 5", () => pm.expect(pm.response.json().detail).to.include("between 1 and 5"));
+    language: text/javascript
+order: 35000

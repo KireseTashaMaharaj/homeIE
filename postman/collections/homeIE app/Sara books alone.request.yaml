@@ -1,0 +1,17 @@
+$kind: http-request
+url: "{{base_url}}/api/bookings"
+method: POST
+body:
+  type: json
+  content: "{\"listing_id\": {{listing_id}}, \"move_in_date\": \"{{move_in}}\", \"move_out_date\": \"{{move_out}}\", \"roommate_usernames\": [], \"message\": \"I'd like to book for just me.\"}"
+scripts:
+  - type: afterResponse
+    code: "pm.test(\"created 201\", () => pm.response.to.have.status(201));\r
+
+      const d = pm.response.json();\r
+
+      pm.test(\"straight to landlord\", () => pm.expect(d.status).to.eql(\"pending_landlord\"));\r
+
+      pm.collectionVariables.set(\"booking_b\", d.id);"
+    language: text/javascript
+order: 19000

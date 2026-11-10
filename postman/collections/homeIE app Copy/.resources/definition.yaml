@@ -1,0 +1,39 @@
+$kind: collection
+description: ""
+variables:
+  base_url: http://localhost:5000
+  token: ""
+  listing_id: ""
+  move_in: ""
+  move_out: ""
+  booking_a: ""
+  booking_b: ""
+  booking_c: ""
+  booking_r: ""
+  review_listing_id: ""
+  booking_v: ""
+scripts:
+  - type: http:beforeRequest
+    code: |-
+      const a = new Date(); a.setDate(a.getDate() + 30);
+      const b = new Date(); b.setDate(b.getDate() + 150);
+      pm.collectionVariables.set("move_in", a.toISOString().slice(0, 10));
+      pm.collectionVariables.set("move_out", b.toISOString().slice(0, 10));
+      const tk = pm.globals.get("live_token");
+      const authType = pm.request.auth && pm.request.auth.type;
+      console.log(pm.info.requestName, "| ends", tk ? tk.slice(-8) : "EMPTY");
+      if (tk && authType !== "noauth") {
+        pm.request.headers.upsert({ key: "Authorization", value: "Bearer " + tk });
+      }
+    language: text/javascript
+  - type: http:afterResponse
+    code: |-
+      if (pm.request.url.getPath().endsWith("/api/auth/login") && pm.response.code === 200) {
+        const d = pm.response.json();
+        const t = d.access_token || d.token;
+        if (t) {
+          pm.globals.set("live_token", t);
+          console.log("LOGIN saved:", pm.info.requestName, "| ends", t.slice(-8));
+        }
+      }
+    language: text/javascript

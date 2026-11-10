@@ -1,0 +1,18 @@
+$kind: http-request
+url: "{{base_url}}/api/auth/login"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: '{"username":"maria", "password":"mariapass"}'
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("login 200", () => pm.response.to.have.status(200));
+      const data = pm.response.json();
+      const t = data.access_token || data.token;
+      pm.test("token present", () => pm.expect(t).to.be.a("string"));
+      pm.collectionVariables.set("token", t);
+    language: text/javascript
+order: 20000

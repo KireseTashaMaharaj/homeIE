@@ -1,0 +1,13 @@
+$kind: http-request
+url: "{{base_url}}/api/admin/listings/pending"
+method: GET
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("200", () => pm.response.to.have.status(200));
+      pm.test("my listing is pending", () => {
+        const ids = pm.response.json().map(l => l.id);
+        pm.expect(ids).to.include(Number(pm.collectionVariables.get("listing_id")));
+      });
+    language: text/javascript
+order: 6000

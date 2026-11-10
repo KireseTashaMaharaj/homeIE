@@ -1,0 +1,13 @@
+$kind: http-request
+url: "{{base_url}}/api/bookings/{{booking_v}}/reviews"
+method: POST
+body:
+  type: json
+  content: '{"rating":5,"comment":"Too short"}'
+scripts:
+  - type: afterResponse
+    code: "pm.test(\"400 short comment\", () => pm.response.to.have.status(400));\r
+
+      pm.test(\"says 20 characters\", () => pm.expect(pm.response.json().detail).to.include(\"20 characters\"));"
+    language: text/javascript
+order: 34000

@@ -1,0 +1,52 @@
+$kind: collection
+variables:
+  base_url: http://localhost:5000
+  token: ""
+  listing_id: ""
+  move_in: ""
+  move_out: ""
+  booking_a: ""
+  booking_b: ""
+  booking_c: ""
+  booking_r: ""
+  review_listing_id: ""
+  booking_v: ""
+scripts:
+  - type: http:beforeRequest
+    code: "const a = new Date(); a.setDate(a.getDate() + 30);\r
+
+      const b = new Date(); b.setDate(b.getDate() + 150);\r
+
+      pm.collectionVariables.set(\"move_in\", a.toISOString().slice(0, 10));\r
+
+      pm.collectionVariables.set(\"move_out\", b.toISOString().slice(0, 10));\r
+
+      const tk = pm.globals.get(\"live_token\");\r
+
+      const authType = pm.request.auth && pm.request.auth.type;\r
+
+      console.log(pm.info.requestName, \"| ends\", tk ? tk.slice(-8) : \"EMPTY\");\r
+
+      if (tk && authType !== \"noauth\") {\r
+
+      \  pm.request.headers.upsert({ key: \"Authorization\", value: \"Bearer \" + tk });\r
+
+      }"
+    language: text/javascript
+  - type: http:afterResponse
+    code: "if (pm.request.url.getPath().endsWith(\"/api/auth/login\") && pm.response.code === 200) {\r
+
+      \  const d = pm.response.json();\r
+
+      \  const t = d.access_token || d.token;\r
+
+      \  if (t) {\r
+
+      \    pm.globals.set(\"live_token\", t);\r
+
+      \    console.log(\"LOGIN saved:\", pm.info.requestName, \"| ends\", t.slice(-8));\r
+
+      \  }\r
+
+      }"
+    language: text/javascript

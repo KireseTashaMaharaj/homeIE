@@ -1,0 +1,18 @@
+$kind: http-request
+url: "{{base_url}}/api/landlord/booking-requests"
+method: GET
+scripts:
+  - type: afterResponse
+    code: "pm.test(\"200\", () => pm.response.to.have.status(200));\r
+
+      pm.test(\"both requests listed\", () => {\r
+
+      \  const ids = pm.response.json().map(b => b.id);\r
+
+      \  pm.expect(ids).to.include(Number(pm.collectionVariables.get(\"booking_a\")));\r
+
+      \  pm.expect(ids).to.include(Number(pm.collectionVariables.get(\"booking_b\")));\r
+
+      });"
+    language: text/javascript
+order: 21000

@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import date, datetime, timezone
 
 from sqlalchemy.pool import StaticPool
 from sqlmodel import Session, SQLModel, create_engine, select
@@ -103,7 +103,7 @@ def test_past_booking_seeds_are_idempotent_and_leave_reviews_unchanged():
                 for booking in all_bookings
                 if booking.id != existing_sara_booking.id
             ]
-            assert len(added) == 3
+            assert len(added) == 4
             assert len({booking.listingId for booking in added}) == 3
             listings_by_id = {
                 listing.id: listing.title for listing in verified_listings.values()
@@ -112,12 +112,28 @@ def test_past_booking_seeds_are_idempotent_and_leave_reviews_unchanged():
                 user.id: username for username, user in users.items()
             }
             assert {
-                listings_by_id[booking.listingId]: booker_names[booking.bookerId]
+                (
+                    listings_by_id[booking.listingId],
+                    booker_names[booking.bookerId],
+                    booking.moveInDate,
+                    booking.moveOutDate,
+                )
                 for booking in added
             } == {
-                "Room near campus": "bob",
-                "Shared flat, 3 bedroom": "bob",
-                "Courtyard student suite": "sara",
+                ("Room near campus", "bob", date(2025, 1, 10), date(2025, 3, 10)),
+                (
+                    "Shared flat, 3 bedroom",
+                    "bob",
+                    date(2025, 4, 10),
+                    date(2025, 6, 10),
+                ),
+                (
+                    "Courtyard student suite",
+                    "sara",
+                    date(2025, 7, 10),
+                    date(2025, 9, 10),
+                ),
+                ("Room near campus", "bob", date(2025, 10, 10), date(2025, 12, 10)),
             }
             assert len(all_bookings) == len(bookings_after_first_run)
             assert len(list(session.exec(select(User)).all())) == len(

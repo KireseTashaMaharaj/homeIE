@@ -1,0 +1,8 @@
+$kind: http-request
+url: "{{base_url}}/api/listings/999999"
+method: GET
+scripts:
+  - type: afterResponse
+    code: pm.test("404 not found", () => pm.response.to.have.status(404));
+    language: text/javascript
+order: 27000

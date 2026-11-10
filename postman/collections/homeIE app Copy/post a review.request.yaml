@@ -1,0 +1,22 @@
+$kind: http-request
+url: "{{base_url}}/api/bookings/{{booking_r}}/reviews"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: '{"rating":5,"comment":"Wonderful room, quiet area very close to campus."}'
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("201 created (or 409 if already posted on an earlier run)", () =>
+        pm.expect([201, 409]).to.include(pm.response.code));
+      if (pm.response.code === 201) {
+        const d = pm.response.json();
+        pm.test("review saved", () => {
+          pm.expect(d.rating).to.eql(5);
+          pm.expect(d.booking_id).to.eql(Number(pm.collectionVariables.get("booking_r")));
+        });
+      }
+    language: text/javascript
+order: 36000

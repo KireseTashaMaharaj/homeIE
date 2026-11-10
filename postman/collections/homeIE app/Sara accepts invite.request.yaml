@@ -1,0 +1,21 @@
+$kind: http-request
+url: "{{base_url}}/api/bookings/{{booking_a}}/invitation"
+method: POST
+body:
+  type: json
+  content: '{"decision": "accept"}'
+scripts:
+  - type: afterResponse
+    code: "pm.test(\"200\", () => pm.response.to.have.status(200));\r
+
+      pm.test(\"now with landlord\", () => {\r
+
+      \  const d = pm.response.json();\r
+
+      \  pm.expect(d.status).to.eql(\"pending_landlord\");\r
+
+      \  pm.expect(d.tenants.every(t => t.response === \"accepted\")).to.eql(true);\r
+
+      });"
+    language: text/javascript
+order: 18000

@@ -1,0 +1,11 @@
+$kind: http-request
+url: "{{base_url}}/api/bookings"
+method: POST
+body:
+  type: json
+  content: '{"listing_id": {{listing_id}}, "move_in_date": "{{move_in}}", "move_out_date": "{{move_out}}", "roommate_usernames": ["sara"], "message": "Hi, we would like to book."}'
+scripts:
+  - type: afterResponse
+    code: pm.test("409 duplicate", () => pm.response.to.have.status(409));
+    language: text/javascript
+order: 15000

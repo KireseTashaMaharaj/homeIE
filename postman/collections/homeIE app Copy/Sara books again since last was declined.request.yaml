@@ -1,0 +1,15 @@
+$kind: http-request
+url: "{{base_url}}/api/bookings"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: '{"listing_id": {{listing_id}}, "move_in_date": "{{move_in}}", "move_out_date": "{{move_out}}", "roommate_usernames": [], "message": "Just me."}'
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("created 201", () => pm.response.to.have.status(201));
+      pm.collectionVariables.set("booking_c", pm.response.json().id);
+    language: text/javascript
+order: 28000

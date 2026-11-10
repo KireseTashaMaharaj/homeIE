@@ -1,0 +1,11 @@
+$kind: http-request
+url: "{{base_url}}/api/bookings/{{booking_r}}/reviews"
+method: POST
+body:
+  type: json
+  content: '{"rating":5,"comment":"Wonderful room, quiet area very close to campus."}'
+scripts:
+  - type: afterResponse
+    code: pm.test("409 already reviewed", () => pm.response.to.have.status(409));
+    language: text/javascript
+order: 37000

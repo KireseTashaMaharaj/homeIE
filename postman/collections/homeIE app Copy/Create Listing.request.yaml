@@ -1,0 +1,20 @@
+$kind: http-request
+url: "{{base_url}}/api/listings"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: '{"title": "Test room near campus", "address": "12 College Rd", "distance_to_campus":0.8, "price": 1800, "room_type":"Private room", "capacity":3,"amenities":"WiFi", "description":"Quiet room.", "photos": ["https://example.com/a.jpg"]}'
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("created 201", () => pm.response.to.have.status(201));
+      const d = pm.response.json();
+      pm.test("draft with photo array", () => {
+        pm.expect(d.status).to.eql("draft");
+        pm.expect(d.photos).to.be.an("array");
+      });
+      pm.collectionVariables.set("listing_id", d.id);
+    language: text/javascript
+order: 2000

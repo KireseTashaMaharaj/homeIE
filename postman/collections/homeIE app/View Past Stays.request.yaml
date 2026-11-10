@@ -1,0 +1,28 @@
+$kind: http-request
+url: "{{base_url}}/api/bookings"
+method: GET
+scripts:
+  - type: afterResponse
+    code: "pm.test(\"200\", () => pm.response.to.have.status(200));\r
+
+      const today = new Date().toISOString().slice(0, 10);\r
+
+      const past = pm.response.json()\r
+
+      \  .filter(b => b.status === \"confirmed\" && b.move_out_date < today)\r
+
+      \  .sort((a, b) => b.move_out_date.localeCompare(a.move_out_date));\r
+
+      pm.test(\"has past confirmed stays\", () => pm.expect(past.length).to.be.above(1));\r
+
+      if (past.length > 1) {\r
+
+      \  pm.collectionVariables.set(\"booking_r\", past[0].id);          // newest: used for the real review\r
+
+      \  pm.collectionVariables.set(\"review_listing_id\", past[0].listing_id);\r
+
+      \  pm.collectionVariables.set(\"booking_v\", past[past.length - 1].id); // oldest: only for error tests\r
+
+      }"
+    language: text/javascript
+order: 33000

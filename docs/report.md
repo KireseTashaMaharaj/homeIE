@@ -14,7 +14,7 @@ Draft this file with the Guide. **Update it after every phase milestone** before
 - **Student name:** Kirese Maharaj
 - **Student ID:** 816040048
 - **Public Render URL:** https://homeie.onrender.com/
-- **YouTube URL:** **PENDING UPLOAD — replace this placeholder with the public video URL after uploading.**
+- **YouTube URL:** https://youtu.be/NzJfnLUFM94
 
 ## Assigned project
 Student Accommodation — a marketplace for students near UWI St. Augustine to find secure rental listings, book alone or with roommates, and review stays.
@@ -361,6 +361,8 @@ The database was recreated with `python manage.py init`; seeding created the dem
 
 Polish requested: admin verification continues to use the shared homeIE sidebar and welcome bar, with the admin label normalized to `Welcome, admin`; listing cards use “sleeps N” and grouped monthly prices; room type is limited to Private room, Shared room, Studio, and Shared flat (the demo seed values already match); Browse cards use wider columns and reserve space for the Verified badge; success flashes are soft green, while rejection and error flashes are soft red. The student reports local end-to-end verification of listing submission, admin approval/rejection, landlord resubmission, and student visibility.
 
+Assignment 2 API adapter check (2026-11-07): the student reports Postman verification for login, landlord listing create/list/submit, admin pending-list/approval, wrong-role 403, unauthenticated 401, and 18/18 collection tests passing. Missing credentials with an absent JSON body initially returned 422; API middleware now rejects unauthenticated requests before request-body validation. Reject/edit/ownership edge cases and browser cookie login remain to be checked.
+
 ### Workflow 2: Student booking request (with roommates)
 
 Added nullable `Booking.message` to the Phase 3 ERD by student choice to support the optional landlord message in the Workflow 2 request form. Roommate usernames will be entered one per line. The student selected Service ownership for the pending-roommates versus pending-landlord transition.
@@ -538,7 +540,7 @@ Every account a marker needs, including extra users you added. Starter accounts:
 
 ## YouTube URL
 
-**PENDING UPLOAD — replace this placeholder with the public video URL after uploading.**
+https://youtu.be/NzJfnLUFM94
 
 ## Session transcripts
 
@@ -598,8 +600,7 @@ Filled by Guide from the student-judge run when this report was built.
 - Render deployment and marker logins are recorded; report notes a successful public landing-page and `/health` check.
 
 ## Gaps (priority order)
-1. The YouTube URL is not available until the student uploads the video. A clearly marked placeholder is present in the report and PDF cover; replace it and re-export afterward.
-2. Separate native Phase 1–4 chats were not available in the sessions accessible to this report build. The phase artefacts are present in `docs/report.md`; this is an evidence availability note, not a student competency deduction.
+1. Separate native Phase 1–4 chats were not available in the sessions accessible to this report build. The phase artefacts are present in `docs/report.md`; this is an evidence availability note, not a student competency deduction.
 
 ## Phase gate status
 | Phase | Status | Note |
@@ -610,9 +611,6 @@ Filled by Guide from the student-judge run when this report was built.
 | 4 | met | W1–W3 wireframe images and use-case coverage are embedded. |
 | 5 | met | Theme, per-workflow implementation, student verification, and continued UI/workflow polish are recorded. |
 | 6 | met | Public Render URL, deployment notes, and seeded marker logins are recorded. |
-
-## Recommended next practice
-- After uploading the assignment video, replace the YouTube placeholder in `docs/report.md` and regenerate the PDF package.
 
 ## Integrity note
 - Clean: no accessible evidence of external-LLM paste-back, transcript gaming, or edited course skills.

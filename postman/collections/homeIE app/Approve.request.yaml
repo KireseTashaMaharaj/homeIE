@@ -1,0 +1,10 @@
+$kind: http-request
+url: "{{base_url}}/api/admin/listings/{{listing_id}}/approve"
+method: POST
+scripts:
+  - type: afterResponse
+    code: "pm.test(\"200\", () => pm.response.to.have.status(200));\r
+
+      pm.test(\"verified\", () => pm.expect(pm.response.json().status).to.eql(\"verified\"));"
+    language: text/javascript
+order: 7000

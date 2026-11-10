@@ -1,0 +1,13 @@
+$kind: http-request
+url: "{{base_url}}/api/bookings/{{booking_a}}/decision"
+method: POST
+body:
+  type: json
+  content: '{"decision": "accept"}'
+scripts:
+  - type: afterResponse
+    code: "pm.test(\"200\", () => pm.response.to.have.status(200));\r
+
+      pm.test(\"confirmed\", () => pm.expect(pm.response.json().status).to.eql(\"confirmed\"));"
+    language: text/javascript
+order: 22000

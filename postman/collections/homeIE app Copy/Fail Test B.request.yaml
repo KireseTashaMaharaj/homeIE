@@ -1,0 +1,13 @@
+$kind: http-request
+url: "{{base_url}}/api/listings"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: '{"title":"Student should not create this","address":"12 College Rd","distance_to_campus":0.8,"price":1800,"room_type":"Private room","capacity":1,"amenities":"WiFi","description":"Quiet room.","photos":["https://example.com/a.jpg"]}'
+scripts:
+  - type: afterResponse
+    code: pm.test("403 for a student", () => pm.response.to.have.status(403));
+    language: text/javascript
+order: 10000

@@ -1,0 +1,10 @@
+$kind: http-request
+url: "{{base_url}}/api/listings/{{listing_id}}/submit"
+method: POST
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("200", () => pm.response.to.have.status(200));
+      pm.test("now pending", () => pm.expect(pm.response.json().status).to.eql("pending"));
+    language: text/javascript
+order: 4000

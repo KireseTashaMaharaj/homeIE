@@ -1,0 +1,19 @@
+$kind: http-request
+name: Review w/ no login
+url: "{{base_url}}/api/bookings/1/reviews"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: '{"rating":5,"comment":"Trying to review without logging in."}'
+auth:
+  type: noauth
+scripts:
+  - type: afterResponse
+    code: pm.test("401 without token", () => pm.response.to.have.status(401));
+    language: text/javascript
+  - type: beforeRequest
+    code: pm.request.headers.remove("Authorization");
+    language: text/javascript
+order: 40000

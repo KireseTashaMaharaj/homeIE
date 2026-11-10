@@ -1,0 +1,22 @@
+$kind: http-request
+name: decline w/ reason
+url: "{{base_url}}/api/bookings/{{booking_b}}/decision"
+method: POST
+body:
+  type: json
+  content: '{"decision":"decline","decline_reason":"Dates no longer available."}'
+scripts:
+  - type: afterResponse
+    code: "pm.test(\"200\", () => pm.response.to.have.status(200));\r
+
+      pm.test(\"declined with reason\", () => {\r
+
+      \  const d = pm.response.json();\r
+
+      \  pm.expect(d.status).to.eql(\"declined\");\r
+
+      \  pm.expect(d.decline_reason).to.eql(\"Dates no longer available.\");\r
+
+      });"
+    language: text/javascript
+order: 24000
